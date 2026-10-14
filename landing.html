@@ -206,6 +206,7 @@ footer{border-top:1px solid var(--border);padding:34px 0;color:var(--muted);font
         <a class="btn-outline" href="/app">Get Pro</a>
       </div>
     </div>
+    <p class="section-sub" style="margin:26px auto 0;text-align:center;">All paid plans: <strong>cancel anytime</strong> · <strong>7-day money-back guarantee</strong> — no questions asked.</p>
   </div>
 </section>
 
@@ -220,6 +221,7 @@ footer{border-top:1px solid var(--border);padding:34px 0;color:var(--muted);font
       <details><summary>Can I cancel anytime?</summary><p>Yes. Manage or cancel your subscription yourself in one click from inside the app — no emails, no phone calls, no hoops.</p></details>
       <details><summary>Can I export my leads?</summary><p>Always. Every plan (including Free) exports leads to CSV, so your data is yours.</p></details>
       <details><summary>Who is this for?</summary><p>Agency owners, web designers, marketing consultants, and salespeople who sell to local businesses. If your customers are found on Google Maps, this finds them.</p></details>
+      <details><summary>What if it's not for me?</summary><p>Cancel anytime in one click — and every paid plan comes with a 7-day money-back guarantee. Email us within your first 7 days and we'll refund you in full, no questions asked.</p></details>
     </div>
   </div>
 </section>
@@ -238,6 +240,11 @@ footer{border-top:1px solid var(--border);padding:34px 0;color:var(--muted);font
     <div>Built by Chaotically Organized AI</div>
   </div>
 </footer>
+<script>
+  try {
+    navigator.sendBeacon('/api/track', new Blob([JSON.stringify({ path: 'landing', ref: document.referrer || '' })], { type: 'application/json' }));
+  } catch (e) {}
+</script>
 </body>
 </html>
 

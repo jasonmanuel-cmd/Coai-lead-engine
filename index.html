@@ -3254,5 +3254,10 @@ function initApp(){
 
 initApp();
 </script>
+<script>
+  try {
+    navigator.sendBeacon('/api/track', new Blob([JSON.stringify({ path: 'app', ref: document.referrer || '' })], { type: 'application/json' }));
+  } catch (e) {}
+</script>
 </body>
 </html>
