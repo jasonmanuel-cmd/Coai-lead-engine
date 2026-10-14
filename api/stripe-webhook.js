@@ -37,7 +37,17 @@ module.exports = async function handler(req, res) {
     const data = event && event.data && event.data.object;
 
     if (type === 'checkout.session.completed' && data) {
-      const userId = parseInt(data.client_reference_id, 10);
+      let userId = parseInt(data.client_reference_id, 10);
+      // Payment-link purchases (buy.stripe.com) have no client_reference_id —
+      // fall back to matching the buyer's email to a COAI account.
+      const buyerEmail = (data.customer_details && data.customer_details.email) || data.customer_email || null;
+      if (!userId && buyerEmail) {
+        const byEmail = await query(
+          'SELECT id FROM users WHERE email = $1', [String(buyerEmail).trim().toLowerCase()]
+        );
+        if (byEmail.rows.length) userId = byEmail.rows[0].id;
+        else console.warn('stripe-webhook: paid via payment link but no COAI account matches email', buyerEmail);
+      }
       if (userId) {
         const plan = (data.metadata && data.metadata.plan) || 'starter';
         await query(
