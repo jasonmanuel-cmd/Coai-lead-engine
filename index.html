@@ -842,6 +842,10 @@ summary:focus-visible,
         <div class="session-stat"><span style="color:var(--muted);">Contacted</span><span id="s-contacted" style="color:var(--amber);font-family:var(--mono);">0</span></div>
         <div class="session-stat"><span style="color:var(--muted);">Closed</span><span id="s-closed" style="color:var(--green);font-family:var(--mono);">0</span></div>
       </div>
+      <div style="margin-top:12px;border-top:1px dashed var(--border);padding-top:10px;">
+        <div class="sidebar-label" style="margin-bottom:6px;">Site Traffic (owner) <button type="button" class="gsr-btn" style="font-size:9px;padding:2px 8px;" onclick="loadAnalytics()">↻ refresh</button></div>
+        <div id="owner-analytics" style="font-family:var(--mono);font-size:11px;line-height:1.7;color:var(--muted);">Enter the owner key, then hit refresh.</div>
+      </div>
       <div class="check-row" style="margin-top:10px;">
         <input type="checkbox" id="crm-clear-before-scan"/>
         <label for="crm-clear-before-scan">Clear CRM before next scan (replace all)</label>
@@ -3250,6 +3254,25 @@ function initApp(){
   updateExportInfo();
   document.getElementById('s-contacted').textContent = contacted.size;
   document.getElementById('s-closed').textContent = closed.size;
+}
+
+// ─── OWNER ANALYTICS (sidebar) ────────────────────────────────────────
+async function loadAnalytics(){
+  const el = document.getElementById('owner-analytics');
+  const authKey = sessionStorage.getItem('coai_auth') || '';
+  if(!authKey){ el.textContent = 'Enter the owner key above first, then refresh.'; return; }
+  el.textContent = 'Loading…';
+  try {
+    const r = await fetch('/api/track', { headers: { 'Authorization': authKey }, signal: AbortSignal.timeout(15000) });
+    if(r.status === 401){ el.textContent = 'Owner key required (analytics are owner-only).'; return; }
+    const a = await r.json();
+    const esc = s => String(s).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+    const refs = (a.topReferrers30d || []).slice(0, 4)
+      .map(x => esc(x.n + ' ← ' + (x.ref || 'direct').replace(/^https?:\/\//, '').slice(0, 30))).join('<br>');
+    el.innerHTML = 'Today: <span style="color:var(--green);">' + a.today + '</span> · 7d: ' + a.last7days +
+      ' · 30d: ' + a.last30days + ' · all: ' + a.allTime +
+      (refs ? '<br><span style="color:var(--muted);">Top sources: ' + refs + '</span>' : '');
+  } catch(e){ el.textContent = 'Analytics unavailable right now.'; }
 }
 
 initApp();
