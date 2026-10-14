@@ -4,32 +4,36 @@ Live site: **https://coaihq.online** (Vercel project `coai-leads`, auto-deploys 
 
 ## 💳 SaaS mode (v2.2) — accounts + subscriptions
 
-Customers now sign up with email/password (100 free scans/mo) and upgrade via Stripe:
-- **Starter — $49/mo** → 1,500 API calls/month (`STRIPE_PRICE_STARTER`)
-- **Pro — $99/mo** → 5,000 API calls/month (`STRIPE_PRICE_PRO`)
+Customers now sign up with email/password (100 free scans/mo) and upgrade via **Stripe or Square**:
+- **Starter — $49/mo** → 1,500 API calls/month
+- **Pro — $99/mo** → 5,000 API calls/month
 - Free tier: 100 API calls/month (no card needed — great for demos)
 - The owner's `APP_PASSWORD` (sidebar "Owner key") still works with unlimited access.
+- The provider is chosen automatically per plan: if a Stripe price ID is set → Stripe Checkout; else if a Square plan variation is set → Square payment link. Both can coexist.
 
 ### New API endpoints
 | Endpoint | Purpose |
 |---|---|
 | `GET/POST /api/auth` | signup / login / logout / session check (httpOnly cookie) |
-| `POST /api/billing` | Stripe Checkout + billing portal URLs |
-| `POST /api/stripe-webhook` | subscription lifecycle sync |
+| `POST /api/billing` | Stripe/Square checkout URLs, portal link, Square cancel |
+| `POST /api/stripe-webhook` | Stripe subscription lifecycle sync |
+| `POST /api/square-webhook` | Square subscription lifecycle sync |
 
 ### Launch checklist (do these before pushing to production)
-1. **Vercel Pro** — the Hobby (free) plan prohibits commercial use. Upgrade the project.
+1. **Vercel Pro** — ✅ already on Pro.
 2. **Stripe** — create 2 recurring Products/Prices: Starter $49/mo, Pro $99/mo. Copy the `price_...` IDs.
+   **OR/AND Square** — create subscription plans in Square (Dashboard → Items → Subscriptions): Starter $49/mo, Pro $99/mo, copy the plan variation IDs (`SQUARE_PLAN_VARIATION_*`).
 3. **Vercel env vars** (Dashboard → Settings → Environment Variables):
    - `DATABASE_URL` — already used by cron/stats; required for accounts. If not set, create a free Postgres (Neon/Vercel Postgres) and set it.
-   - `STRIPE_SECRET_KEY` — `sk_live_...` (or `sk_test_...` while testing)
-   - `STRIPE_PRICE_STARTER` — `price_...`
-   - `STRIPE_PRICE_PRO` — `price_...`
-   - `STRIPE_WEBHOOK_URL_SECRET` — any long random string (also enables webhook auth)
-4. **Stripe webhook** — Dashboard → Developers → Webhooks → add endpoint:
-   `https://coaihq.online/api/stripe-webhook?secret=<your STRIPE_WEBHOOK_URL_SECRET>`
-   Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`
-5. **Enable Stripe customer portal** — Dashboard → Settings → Billing → Customer portal → activate.
+   - Stripe: `STRIPE_SECRET_KEY`, `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_PRO`
+   - Square: `SQUARE_ACCESS_TOKEN` (from Developer Console, with ORDERS + SUBSCRIPTIONS permissions), `SQUARE_LOCATION_ID`, `SQUARE_PLAN_VARIATION_STARTER`, `SQUARE_PLAN_VARIATION_PRO`
+   - `STRIPE_WEBHOOK_URL_SECRET` + `SQUARE_WEBHOOK_URL_SECRET` — long random strings (webhook auth)
+   - `SQUARE_SIGNATURE_KEY` — Square webhook signature key (enables full webhook signature verification)
+   - `SQUARE_WEBHOOK_NOTIFICATION_URL` — defaults to `https://coaihq.online/api/square-webhook` (must match the Square dashboard URL for signatures)
+4. **Webhooks**:
+   - Stripe → `https://coaihq.online/api/stripe-webhook?secret=<STRIPE_WEBHOOK_URL_SECRET>` — events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`
+   - Square → `https://coaihq.online/api/square-webhook?secret=<SQUARE_WEBHOOK_URL_SECRET>` — events: `subscription.created`, `subscription.updated`
+5. **Enable Stripe customer portal** — Dashboard → Settings → Billing → Customer portal → activate. (Square has no portal — customers cancel in-app via "Manage" → confirm.)
 6. Deploy: `git push` (auto-deploys).
 
 ### Database tables (auto-created on first auth call)

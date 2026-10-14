@@ -1696,8 +1696,23 @@ async function openBillingPortal(){
       body: JSON.stringify({ action: 'portal' })
     });
     const data = await resp.json().catch(()=>({}));
-    if(data.url){ window.location.href = data.url; }
-    else{ alert(data.error || 'Subscribe to a plan first.'); }
+    if(data.url){
+      window.location.href = data.url;
+    }else if(data.can_cancel){
+      // Square: no self-serve portal — cancel in-app after confirmation
+      if(confirm((data.message || 'Cancel your subscription?') + '\n\nCancel your COAI subscription now? Your plan stays active until the end of the paid period.')){
+        const cancelResp = await fetch('/api/billing', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'cancel' })
+        });
+        const cancelData = await cancelResp.json().catch(()=>({}));
+        alert(cancelData.message || cancelData.error || 'Done.');
+        refreshAccount();
+      }
+    }else{
+      alert(data.message || data.error || 'Subscribe to a plan first.');
+    }
   }catch(e){ alert('Billing portal error: ' + e.message); }
 }
 // Check login state on load + handle Stripe checkout return
