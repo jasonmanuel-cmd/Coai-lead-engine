@@ -36,9 +36,9 @@ Customers now sign up with email/password (10 free scans/mo) and upgrade via **S
    - `SQUARE_SIGNATURE_KEY` — Square webhook signature key (enables full webhook signature verification)
    - `SQUARE_WEBHOOK_NOTIFICATION_URL` — defaults to `https://coaihq.online/api/square-webhook` (must match the Square dashboard URL for signatures)
 4. **Webhooks**:
-   - Stripe → `https://coaihq.online/api/stripe-webhook?secret=<STRIPE_WEBHOOK_URL_SECRET>` — events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`
+   - ✅ Stripe webhook live (2026-10-14, destination `we_1UQXE30u37S56JoGPSWwQXXZ`) → `https://coaihq.online/api/stripe-webhook?secret=<STRIPE_WEBHOOK_URL_SECRET>` — events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`
    - Square → `https://coaihq.online/api/square-webhook?secret=<SQUARE_WEBHOOK_URL_SECRET>` — events: `subscription.created`, `subscription.updated`
-5. **Enable Stripe customer portal** — Dashboard → Settings → Billing → Customer portal → activate. (Square has no portal — customers cancel in-app via "Manage" → confirm.)
+5. ✅ **Stripe customer portal enabled** (2026-10-14). Portal login link (sendable to customers): https://billing.stripe.com/p/login/5kQ3cn3YZ4Una948oT5c400 — in-app "Manage" button also auto-creates per-customer portal sessions. (Square has no portal — customers cancel in-app via "Manage" → confirm.)
 6. Deploy: `git push` (auto-deploys).
 
 ### Database tables (auto-created on first auth call)
