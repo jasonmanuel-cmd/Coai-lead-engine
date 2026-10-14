@@ -1,9 +1,14 @@
-// api/search.js — COAI Lead Engine Backend v2.1
+// api/search.js — COAI Lead Engine Backend v2.2 (SaaS)
 // Adds exact business lookup and richer Place Details support.
+// Auth: customer session cookie (see api/auth.js) or the owner's APP_PASSWORD
+// master key. Every proxied Google call is metered against the caller's plan.
 //
 // Required Vercel env vars:
 //   GOOGLE_PLACES_API_KEY
-//   APP_PASSWORD
+//   APP_PASSWORD (owner master key — optional but recommended)
+//   DATABASE_URL  (for accounts/usage)
+
+const { requireMeteredCaller, recordUsage } = require('../lib/saas');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -11,12 +16,14 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const MASTER_PASSWORD = process.env.APP_PASSWORD;
-  if (!MASTER_PASSWORD) {
-    return res.status(500).json({ error: 'Server misconfiguration: APP_PASSWORD not set.' });
-  }
-  if (req.headers.authorization !== MASTER_PASSWORD) {
-    return res.status(401).json({ error: 'Unauthorized: Invalid Access Key.' });
+  let caller;
+  try {
+    caller = await requireMeteredCaller(req);
+  } catch (authErr) {
+    return res.status(authErr.statusCode || 401).json({
+      error: authErr.message,
+      upgrade: Boolean(authErr.upgrade),
+    });
   }
 
   const {
@@ -25,7 +32,15 @@ module.exports = async function handler(req, res) {
   } = req.query;
 
   if (mode === 'ping') {
-    return res.status(200).json({ status: 'authorized' });
+    return res.status(200).json({
+      status: 'authorized',
+      admin: caller.admin,
+      email: caller.email,
+      plan: caller.plan,
+      planName: caller.planName,
+      usage: caller.usage,
+      quota: caller.quota === Infinity ? 'unlimited' : caller.quota,
+    });
   }
 
   const apiKey = process.env.GOOGLE_PLACES_API_KEY;
@@ -34,6 +49,10 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    // Meter this proxied call (every mode below hits the Google API ≥once).
+    // +1 extra if the nearby-search path needs a geocode first.
+    await recordUsage(caller.id, 1);
+
     if (mode === 'geocode') {
       if (!location) return res.status(400).json({ error: 'location param required.' });
       const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=${apiKey}`;
@@ -75,6 +94,7 @@ module.exports = async function handler(req, res) {
     if (!resolvedLat || !resolvedLng) {
       if (!location) return res.status(400).json({ error: 'Provide lat+lng or location.' });
       const geoUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=${apiKey}`;
+      await recordUsage(caller.id, 1); // the geocode counts too
       const geoData = await (await fetch(geoUrl)).json();
       if (geoData.status !== 'OK' || !geoData.results.length) {
         return res.status(400).json({ error: 'Geocode failed: ' + geoData.status });

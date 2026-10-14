@@ -796,11 +796,27 @@ summary:focus-visible,
     </details>
 
     <div class="sidebar-section">
-      <div class="sidebar-label">Access</div>
-      <div class="field">
-        <label>App Access Key</label>
-        <input type="password" id="app-password" placeholder="Your COAI access key…"/>
-        <small>Enter the key set in Vercel → APP_PASSWORD. Google API key stays server-side — never exposed to the browser.</small>
+      <div class="sidebar-label">Account</div>
+      <div id="account-logged-out" style="display:flex;flex-direction:column;gap:7px;">
+        <button class="search-btn" style="font-size:11px;" onclick="openAuthModal('login')">⭕ LOG IN</button>
+        <button class="gsr-btn" style="font-size:10px;" onclick="openAuthModal('signup')">⚡ Create free account — 100 scans/mo</button>
+        <small style="color:var(--muted);">Free accounts get 100 scans/month. The Google API key stays server-side — never exposed to the browser.</small>
+      </div>
+      <div id="account-logged-in" style="display:none;flex-direction:column;gap:7px;">
+        <div class="session-stat"><span style="color:var(--muted);">Account</span><span id="acct-email" style="color:var(--white);font-family:var(--mono);font-size:10px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span></div>
+        <div class="session-stat"><span style="color:var(--muted);">Plan</span><span id="acct-plan" style="color:var(--green);font-family:var(--mono);font-size:10px;"></span></div>
+        <div class="session-stat"><span style="color:var(--muted);">Usage</span><span id="acct-usage" style="color:var(--white);font-family:var(--mono);font-size:10px;"></span></div>
+        <div id="acct-usage-bar" style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:2px;"><div id="acct-usage-fill" style="height:100%;width:0%;background:var(--green);"></div></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+          <button class="gsr-btn" style="font-size:9px;" onclick="openPricingModal()">⚡ Upgrade</button>
+          <button class="gsr-btn" style="font-size:9px;" onclick="openBillingPortal()">Manage</button>
+          <button class="gsr-btn" style="font-size:9px;" onclick="doLogout()">Log out</button>
+        </div>
+      </div>
+      <div class="field" style="margin-top:10px;">
+        <label>Owner key (optional)</label>
+        <input type="password" id="app-password" placeholder="Admin master key…"/>
+        <small style="color:var(--muted);">Optional — the owner's APP_PASSWORD overrides login (unlimited).</small>
       </div>
       <button class="search-btn" id="search-btn" onclick="runSearch()">
         ◉ SCAN FOR LEADS
@@ -997,6 +1013,80 @@ summary:focus-visible,
 </div>
 
 <!-- OUTREACH MODAL -->
+<div class="modal-overlay" id="auth-modal" onclick="closeAuthModal(event)">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:380px;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="auth-modal-title">Log In</div>
+        <div class="modal-biz">COAI Lead Engine</div>
+      </div>
+      <button class="modal-close" onclick="closeAuthModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field" style="margin-bottom:10px;">
+        <label>Email</label>
+        <input type="email" id="auth-email" placeholder="you@company.com" autocomplete="email"/>
+      </div>
+      <div class="field" style="margin-bottom:10px;display:none;" id="auth-name-field">
+        <label>Name (optional)</label>
+        <input id="auth-name" placeholder="Your name" autocomplete="name"/>
+      </div>
+      <div class="field" style="margin-bottom:14px;">
+        <label>Password <span id="auth-pass-hint">(8+ characters)</span></label>
+        <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password"/>
+      </div>
+      <div id="auth-error" style="color:var(--red);font-size:11px;margin-bottom:10px;display:none;"></div>
+      <div class="modal-actions" style="justify-content:space-between;">
+        <button class="gsr-btn" id="auth-switch-btn" onclick="switchAuthMode()">Create account</button>
+        <button class="search-btn" style="flex:1;font-size:11px;" id="auth-submit-btn" onclick="submitAuth()">LOG IN</button>
+      </div>
+      <small style="color:var(--muted);display:block;margin-top:10px;">By creating an account you agree to the <a href="/tos" style="color:var(--green);">Terms of Service</a> and <a href="/privacy" style="color:var(--green);">Privacy Policy</a>.</small>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="pricing-modal" onclick="closePricingModal(event)">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:620px;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">⚡ Upgrade — unlock more scans</div>
+        <div class="modal-biz">Cancel anytime · Secure checkout via Stripe</div>
+      </div>
+      <button class="modal-close" onclick="closePricingModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:230px;border:1px solid var(--border);border-radius:4px;padding:16px;">
+          <div style="font-weight:700;letter-spacing:1px;">STARTER</div>
+          <div style="font-family:var(--mono);font-size:24px;color:var(--green);margin:6px 0;">$49<span style="font-size:11px;color:var(--muted);">/month</span></div>
+          <ul style="font-size:11px;color:var(--muted);list-style:none;margin:10px 0;display:flex;flex-direction:column;gap:5px;">
+            <li>✓ 1,500 API calls / month</li>
+            <li>✓ Full industry library (150+)</li>
+            <li>✓ CSV export + webhook push</li>
+            <li>✓ AI outreach generator</li>
+            <li>✓ Opportunity scoring</li>
+          </ul>
+          <button class="search-btn" style="width:100%;font-size:11px;" onclick="startCheckout('starter')">⚡ GET STARTER</button>
+        </div>
+        <div style="flex:1;min-width:230px;border:1px solid var(--red);border-radius:4px;padding:16px;position:relative;">
+          <div style="position:absolute;top:-9px;right:12px;background:var(--red);color:#fff;font-size:9px;font-family:var(--mono);padding:2px 8px;border-radius:2px;letter-spacing:1px;">BEST VALUE</div>
+          <div style="font-weight:700;letter-spacing:1px;">PRO 🔥</div>
+          <div style="font-family:var(--mono);font-size:24px;color:var(--green);margin:6px 0;">$99<span style="font-size:11px;color:var(--muted);">/month</span></div>
+          <ul style="font-size:11px;color:var(--muted);list-style:none;margin:10px 0;display:flex;flex-direction:column;gap:5px;">
+            <li>✓ 5,000 API calls / month</li>
+            <li>✓ Everything in Starter</li>
+            <li>✓ Priority scan queue</li>
+            <li>✓ All radius tiers (50mi)</li>
+            <li>✓ Best for agencies</li>
+          </ul>
+          <button class="search-btn" style="width:100%;font-size:11px;border-color:var(--red);" onclick="startCheckout('pro')">🔥 GET PRO</button>
+        </div>
+      </div>
+      <small style="color:var(--muted);display:block;margin-top:12px;">Need to cancel or change your card later? Use the "Manage" button in the sidebar — self-serve Stripe billing portal.</small>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-header">
@@ -1455,6 +1545,16 @@ async function serverFetch(params){
   });
   if(!resp.ok){
     const errBody = await resp.json().catch(()=>({}));
+    if(resp.status === 402){
+      const e = new Error('QUOTA_EXCEEDED: ' + (errBody.error || 'Monthly quota reached — upgrade to keep scanning.'));
+      e.quota = true;
+      throw e;
+    }
+    if(resp.status === 401){
+      const e = new Error('LOGIN_REQUIRED: ' + (errBody.error || 'Please sign in.'));
+      e.auth = true;
+      throw e;
+    }
     throw new Error(errBody.error || 'Server error: ' + resp.status);
   }
   return resp.json();
@@ -1462,6 +1562,159 @@ async function serverFetch(params){
 
 // ─── SLEEP ───
 function sleep(ms){return new Promise(r => setTimeout(r, ms));}
+
+// ─── ACCOUNT / BILLING (SaaS) ─────────────────────────────────────────
+let accountState = null; // null = logged out; { email, plan, planName, usage, quota, ... }
+
+async function refreshAccount(){
+  try{
+    const resp = await fetch('/api/auth');
+    const data = await resp.json().catch(()=>({authenticated:false}));
+    accountState = data.authenticated ? data : null;
+    renderAccountUI();
+  }catch(e){
+    console.warn('Account check failed:', e.message);
+  }
+}
+
+function renderAccountUI(){
+  const out = document.getElementById('account-logged-out');
+  const inn = document.getElementById('account-logged-in');
+  if(!out || !inn) return;
+  if(accountState){
+    out.style.display = 'none';
+    inn.style.display = 'flex';
+    document.getElementById('acct-email').textContent = accountState.admin ? 'OWNER (master key)' : accountState.email;
+    document.getElementById('acct-plan').textContent = accountState.planName || accountState.plan || 'Free';
+    const quota = accountState.quota === 'unlimited' ? Infinity : accountState.quota;
+    if(quota === Infinity){
+      document.getElementById('acct-usage').textContent = 'unlimited';
+      document.getElementById('acct-usage-fill').style.width = '0%';
+    }else{
+      const pct = quota > 0 ? Math.min(100, Math.round((accountState.usage / quota) * 100)) : 0;
+      document.getElementById('acct-usage').textContent = `${accountState.usage} / ${quota} this month`;
+      const fill = document.getElementById('acct-usage-fill');
+      fill.style.width = pct + '%';
+      fill.style.background = pct >= 90 ? 'var(--red)' : pct >= 70 ? 'var(--amber)' : 'var(--green)';
+    }
+  }else{
+    out.style.display = 'flex';
+    inn.style.display = 'none';
+  }
+}
+
+let authMode = 'login';
+function openAuthModal(mode){
+  authMode = mode || 'login';
+  updateAuthModalUI();
+  const errEl = document.getElementById('auth-error');
+  if(errEl) errEl.style.display = 'none';
+  document.getElementById('auth-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('auth-email').focus(), 50);
+}
+function closeAuthModal(e){
+  if(!e || e.target.id === 'auth-modal') document.getElementById('auth-modal').classList.remove('open');
+}
+function switchAuthMode(){
+  authMode = authMode === 'login' ? 'signup' : 'login';
+  updateAuthModalUI();
+}
+function updateAuthModalUI(){
+  const isSignup = authMode === 'signup';
+  document.getElementById('auth-modal-title').textContent = isSignup ? 'Create your free account' : 'Log In';
+  document.getElementById('auth-submit-btn').textContent = isSignup ? '⚡ CREATE ACCOUNT' : 'LOG IN';
+  document.getElementById('auth-switch-btn').textContent = isSignup ? 'I already have an account' : 'Create account';
+  document.getElementById('auth-name-field').style.display = isSignup ? 'block' : 'none';
+  const hint = document.getElementById('auth-pass-hint');
+  if(hint) hint.style.display = isSignup ? 'inline' : 'none';
+  document.getElementById('auth-password').setAttribute('autocomplete', isSignup ? 'new-password' : 'current-password');
+}
+async function submitAuth(){
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const name = document.getElementById('auth-name') ? document.getElementById('auth-name').value.trim() : '';
+  const errEl = document.getElementById('auth-error');
+  const btn = document.getElementById('auth-submit-btn');
+  const fail = (msg) => { errEl.textContent = msg; errEl.style.display = 'block'; };
+  if(!email) return fail('Enter your email address.');
+  if(!password) return fail('Enter your password.');
+  if(authMode === 'signup' && password.length < 8) return fail('Password must be at least 8 characters.');
+  btn.disabled = true;
+  try{
+    const resp = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: authMode, email, password, name })
+    });
+    const data = await resp.json().catch(()=>({}));
+    if(!resp.ok) return fail(data.error || 'Something went wrong. Try again.');
+    closeAuthModal();
+    document.getElementById('auth-password').value = '';
+    await refreshAccount();
+  }catch(e){
+    fail('Network error: ' + e.message);
+  }finally{
+    btn.disabled = false;
+  }
+}
+async function doLogout(){
+  try{
+    await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'logout' })
+    });
+  }catch(e){ console.warn(e); }
+  accountState = null;
+  renderAccountUI();
+}
+function openPricingModal(){
+  closeAuthModal();
+  document.getElementById('pricing-modal').classList.add('open');
+}
+function closePricingModal(e){
+  if(!e || e.target.id === 'pricing-modal') document.getElementById('pricing-modal').classList.remove('open');
+}
+async function startCheckout(plan){
+  if(!accountState){ openAuthModal('signup'); return; }
+  try{
+    const resp = await fetch('/api/billing', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'checkout', plan })
+    });
+    const data = await resp.json().catch(()=>({}));
+    if(data.url){ window.location.href = data.url; }
+    else{ alert(data.error || 'Checkout failed — is Stripe configured?'); }
+  }catch(e){ alert('Checkout error: ' + e.message); }
+}
+async function openBillingPortal(){
+  try{
+    const resp = await fetch('/api/billing', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'portal' })
+    });
+    const data = await resp.json().catch(()=>({}));
+    if(data.url){ window.location.href = data.url; }
+    else{ alert(data.error || 'Subscribe to a plan first.'); }
+  }catch(e){ alert('Billing portal error: ' + e.message); }
+}
+// Check login state on load + handle Stripe checkout return
+document.addEventListener('DOMContentLoaded', () => {
+  refreshAccount();
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('upgraded') === '1'){
+    history.replaceState(null, '', '/');
+    setTimeout(async () => {
+      await refreshAccount();
+      alert('⚡ Payment complete — your plan is active. Welcome aboard!');
+    }, 2000);
+  }
+  if(params.get('canceled') === '1'){
+    history.replaceState(null, '', '/');
+  }
+});
 
 // Nearby Search often omits website + phone; Place Details returns what you see on Maps.
 async function enrichPlaceWithDetails(place){
@@ -1662,13 +1915,9 @@ async function fetchCategoryLeads(cat, lat, lng, radius, maxResults){
 
 // ─── MAIN SEARCH ───
 async function runSearch(){
-  const appPassword = document.getElementById('app-password').value.trim();
-  if(!appPassword){
-    alert('Enter your App Access Key in the sidebar.\n\nThis is the APP_PASSWORD you set in Vercel → Settings → Environment Variables.');
-    return;
-  }
-  // Store in sessionStorage so enrich + outreach calls can reuse it this session
-  sessionStorage.setItem('coai_auth', appPassword);
+  const adminKey = (document.getElementById('app-password').value || '').trim() || sessionStorage.getItem('coai_auth') || '';
+  if(adminKey){ sessionStorage.setItem('coai_auth', adminKey); }
+  if(!adminKey && !accountState){ openAuthModal('login'); return; }
   if(activeCats.size === 0){alert('Select at least one industry category.');return;}
 
   const location = document.getElementById('location').value.trim() || 'Bakersfield, CA';
@@ -1702,9 +1951,16 @@ async function runSearch(){
 
     let lat = 35.3733, lng = -119.0187;
     try{
-      // Verify auth first with a ping
+      // Verify auth first with a ping (also refreshes the usage meter)
       const ping = await serverFetch({ mode: 'ping' });
       if(ping.status !== 'authorized') throw new Error('KEY_DENIED');
+      if(ping.email){
+        accountState = Object.assign({}, accountState || {}, {
+          email: ping.email, admin: ping.admin, plan: ping.plan,
+          planName: ping.planName, usage: ping.usage, quota: ping.quota
+        });
+        renderAccountUI();
+      }
 
       const geo = await serverFetch({ mode: 'geocode', location });
       if(geo.status === 'REQUEST_DENIED') throw new Error('KEY_DENIED');
@@ -1713,11 +1969,22 @@ async function runSearch(){
         lng = geo.results[0].geometry.location.lng;
       }
     }catch(geoErr){
-      if(geoErr.message === 'KEY_DENIED' || geoErr.message.includes('Unauthorized') || geoErr.message.includes('401')){
+      if(geoErr.quota || geoErr.message.includes('QUOTA_EXCEEDED')){
         document.getElementById('loading-wrap').style.display = 'none';
         document.getElementById('empty-state').style.display = 'flex';
         document.getElementById('search-btn').disabled = false;
-        alert('ACCESS DENIED.\n\nThe App Access Key you entered is incorrect.\nCheck Vercel → Settings → Environment Variables → APP_PASSWORD.');
+        openPricingModal();
+        return;
+      }
+      if(geoErr.auth || geoErr.message.includes('LOGIN_REQUIRED') || geoErr.message === 'KEY_DENIED' || geoErr.message.includes('Unauthorized') || geoErr.message.includes('401')){
+        document.getElementById('loading-wrap').style.display = 'none';
+        document.getElementById('empty-state').style.display = 'flex';
+        document.getElementById('search-btn').disabled = false;
+        if(!accountState && !adminKey){
+          openAuthModal('login');
+        }else{
+          alert('ACCESS DENIED.\n\nYour session may have expired — log out and log back in, or enter the owner key in the sidebar.');
+        }
         return;
       }
       console.warn('Geocode failed, using Bakersfield default:', geoErr.message);
@@ -1816,7 +2083,13 @@ async function runSearch(){
   }catch(err){
     document.getElementById('loading-wrap').style.display = 'none';
     document.getElementById('empty-state').style.display = 'flex';
-    alert('Error: ' + err.message);
+    if(err.quota || String(err.message).includes('QUOTA_EXCEEDED')){
+      openPricingModal();
+    }else if(err.auth || String(err.message).includes('LOGIN_REQUIRED')){
+      openAuthModal('login');
+    }else{
+      alert('Error: ' + err.message);
+    }
   }
   document.getElementById('search-btn').disabled = false;
 }

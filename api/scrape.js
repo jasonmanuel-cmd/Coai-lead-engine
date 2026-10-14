@@ -15,6 +15,7 @@
 const { escalate } = require('./scrape/pipeline/escalation');
 const { isAllowed } = require('./scrape/utils/robots');
 const { detectCaptcha } = require('./scrape/transport/captcha');
+const { resolveCaller } = require('../lib/saas');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -23,12 +24,9 @@ module.exports = async function handler(req, res) {
   res.setHeader('X-Robots-Tag', 'noindex');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const MASTER_PASSWORD = process.env.APP_PASSWORD;
-  if (!MASTER_PASSWORD) {
-    return res.status(500).json({ error: 'Server misconfiguration: APP_PASSWORD not set in environment.' });
-  }
-  if (req.headers['authorization'] !== MASTER_PASSWORD) {
-    return res.status(401).json({ error: 'Unauthorized' });
+  const caller = await resolveCaller(req);
+  if (!caller) {
+    return res.status(401).json({ error: 'Unauthorized — please sign in.' });
   }
 
   const { url, skip_levels } = req.query;

@@ -7,10 +7,15 @@
     { "src": "api/audit.js", "use": "@vercel/node" },
     { "src": "api/discover.js", "use": "@vercel/node" },
     { "src": "api/stats.js", "use": "@vercel/node" },
+    { "src": "api/auth.js", "use": "@vercel/node" },
+    { "src": "api/billing.js", "use": "@vercel/node" },
+    { "src": "api/stripe-webhook.js", "use": "@vercel/node" },
     { "src": "api/cron-discover.js", "use": "@vercel/node" },
     { "src": "api/cron-audit.js", "use": "@vercel/node" },
     { "src": "api/cron-qualify.js", "use": "@vercel/node" },
     { "src": "api/cron-outreach.js", "use": "@vercel/node" },
+    { "src": "tos.html", "use": "@vercel/static" },
+    { "src": "privacy.html", "use": "@vercel/static" },
     { "src": "index.html",      "use": "@vercel/static" }
   ],
   "routes": [
@@ -20,10 +25,15 @@
     { "src": "/api/audit",    "dest": "/api/audit.js"    },
     { "src": "/api/discover", "dest": "/api/discover.js" },
     { "src": "/api/stats",    "dest": "/api/stats.js"    },
+    { "src": "/api/auth",     "dest": "/api/auth.js"     },
+    { "src": "/api/billing",  "dest": "/api/billing.js"  },
+    { "src": "/api/stripe-webhook", "dest": "/api/stripe-webhook.js" },
     { "src": "/api/cron-discover", "dest": "/api/cron-discover.js" },
     { "src": "/api/cron-audit", "dest": "/api/cron-audit.js" },
     { "src": "/api/cron-qualify", "dest": "/api/cron-qualify.js" },
     { "src": "/api/cron-outreach", "dest": "/api/cron-outreach.js" },
+    { "src": "/tos", "dest": "/tos.html" },
+    { "src": "/privacy", "dest": "/privacy.html" },
     { "src": "/(.*)",         "dest": "/index.html"      }
   ],
   "crons": [

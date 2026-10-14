@@ -1,5 +1,6 @@
 // api/stats.js — Orchestrator dashboard stats
 const { query, initSchema } = require('../lib/db');
+const { resolveCaller } = require('../lib/saas');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -7,8 +8,8 @@ module.exports = async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const password = process.env.APP_PASSWORD;
-  if (!password || req.headers.authorization !== password) {
+  const caller = await resolveCaller(req);
+  if (!caller) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 

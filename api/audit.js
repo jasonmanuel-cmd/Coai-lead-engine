@@ -1,12 +1,13 @@
 // api/audit.js — lightweight website opportunity audit
+const { resolveCaller } = require('../lib/saas');
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
-  const password=process.env.APP_PASSWORD;
-  if(!password)return res.status(500).json({error:'APP_PASSWORD not configured.'});
-  if(req.headers.authorization!==password)return res.status(401).json({error:'Unauthorized.'});
+  const caller=await resolveCaller(req);
+  if(!caller)return res.status(401).json({error:'Unauthorized.'});
   const {url=''}=req.query;if(!/^https?:\/\//i.test(url))return res.status(400).json({error:'A full http(s) URL is required.'});
   try{
     const started=Date.now();const r=await fetch(url,{redirect:'follow',headers:{'User-Agent':'Mozilla/5.0 Chrome/124 Safari/537.36'},signal:AbortSignal.timeout(15000)});const body=await r.text();const lower=body.toLowerCase();const visible=body.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').toLowerCase();const responseMs=Date.now()-started;

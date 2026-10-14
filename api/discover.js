@@ -1,12 +1,13 @@
 // api/discover.js — cautious website discovery and verification
+const { resolveCaller } = require('../lib/saas');
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
-  const password = process.env.APP_PASSWORD;
-  if (!password) return res.status(500).json({ error: 'APP_PASSWORD not configured.' });
-  if (req.headers.authorization !== password) return res.status(401).json({ error: 'Unauthorized.' });
+  const caller = await resolveCaller(req);
+  if (!caller) return res.status(401).json({ error: 'Unauthorized.' });
   const { name = '', phone = '', address = '', city = '' } = req.query;
   if (!name.trim()) return res.status(400).json({ error: 'name is required.' });
   const excluded = ['google.com','bing.com','duckduckgo.com','yahoo.com','yelp.com','facebook.com','instagram.com','linkedin.com','yellowpages.com','mapquest.com','bbb.org','manta.com','nextdoor.com','angi.com','thumbtack.com','homeadvisor.com','chamberofcommerce.com','porch.com','buildzoom.com'];
