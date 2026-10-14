@@ -17,7 +17,9 @@
     { "src": "api/cron-outreach.js", "use": "@vercel/node" },
     { "src": "tos.html", "use": "@vercel/static" },
     { "src": "privacy.html", "use": "@vercel/static" },
-    { "src": "index.html",      "use": "@vercel/static" }
+    { "src": "index.html",      "use": "@vercel/static" },
+    { "src": "robots.txt",      "use": "@vercel/static" },
+    { "src": "sitemap.xml",     "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/api/search",   "dest": "/api/search.js"   },
@@ -36,6 +38,8 @@
     { "src": "/api/cron-outreach", "dest": "/api/cron-outreach.js" },
     { "src": "/tos", "dest": "/tos.html" },
     { "src": "/privacy", "dest": "/privacy.html" },
+    { "src": "/robots.txt", "dest": "/robots.txt" },
+    { "src": "/sitemap.xml", "dest": "/sitemap.xml" },
     { "src": "/(.*)",         "dest": "/index.html"      }
   ],
   "crons": [

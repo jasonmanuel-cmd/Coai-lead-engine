@@ -4,10 +4,10 @@ Live site: **https://coaihq.online** (Vercel project `coai-leads`, auto-deploys 
 
 ## 💳 SaaS mode (v2.2) — accounts + subscriptions
 
-Customers now sign up with email/password (100 free scans/mo) and upgrade via **Stripe or Square**:
+Customers now sign up with email/password (10 free scans/mo) and upgrade via **Stripe or Square**:
 - **Starter — $49/mo** → 1,500 API calls/month
 - **Pro — $99/mo** → 5,000 API calls/month
-- Free tier: 100 API calls/month (no card needed — great for demos)
+- Free tier: 10 API calls/month (no card needed — enough to demo the product)
 - The owner's `APP_PASSWORD` (sidebar "Owner key") still works with unlimited access.
 - The provider is chosen automatically per plan: if a Stripe price ID is set → Stripe Checkout; else if a Square plan variation is set → Square payment link. Both can coexist.
 
