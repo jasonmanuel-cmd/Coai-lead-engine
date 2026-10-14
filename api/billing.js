@@ -56,8 +56,8 @@ module.exports = async function handler(req, res) {
           customer: caller.stripeCustomerId || undefined,
           'subscription_data[metadata][user_id]': String(caller.id),
           'subscription_data[metadata][plan]': planDef.key,
-          success_url: `${base}/?upgraded=1`,
-          cancel_url: `${base}/?canceled=1`,
+          success_url: `${base}/app?upgraded=1`,
+          cancel_url: `${base}/app?canceled=1`,
           allow_promotion_codes: 'true',
         });
         return res.status(200).json({ url: session.url, provider: 'stripe' });
