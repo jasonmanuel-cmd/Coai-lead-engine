@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>COAI Lead Engine — Find Local Business Leads in Minutes</title>
+<meta name="description" content="Scan any city or industry for fresh local business leads in minutes. Get scores, phone numbers, emails, and AI-written outreach messages. Free account — no credit card. Plans from $49/mo."/>
+<link rel="canonical" href="https://coaihq.online/"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="COAI Lead Engine"/>
+<meta property="og:title" content="COAI Lead Engine — Find Local Business Leads in Minutes"/>
+<meta property="og:description" content="Scan any city or industry for local business leads, score them, and reach out with AI-written messages. Free to start — no credit card."/>
+<meta property="og:url" content="https://coaihq.online/"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="COAI Lead Engine — Find Local Business Leads in Minutes"/>
+<meta name="twitter:description" content="Scan any city or industry for local business leads, score them, and reach out with AI-written messages. Free to start."/>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"COAI Lead Engine","applicationCategory":"BusinessApplication","operatingSystem":"Web","url":"https://coaihq.online/","description":"Find, score, and reach local business leads. Scans any city or industry, returns contact details, lead scores, AI-written outreach, CRM pipeline, and CSV export.","offers":[{"@type":"Offer","name":"Free","price":"0","priceCurrency":"USD","description":"10 scans per month"},{"@type":"Offer","name":"Starter","price":"49","priceCurrency":"USD","description":"1,500 scans per month"},{"@type":"Offer","name":"Pro","price":"99","priceCurrency":"USD","description":"5,000 scans per month"}]}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --black:#0a0a0a;--surface:#111;--surface2:#161616;--surface3:#1c1c1c;
+  --border:rgba(255,255,255,0.07);--border-hot:rgba(255,255,255,0.15);
+  --green:#00ff88;--green-dim:rgba(0,255,136,0.09);
+  --red:#ff3b30;--amber:#ffb800;--blue:#3b9eff;--purple:#a78bfa;
+  --white:#f0efe8;--muted:hsl(40 9% 62%);
+  --mono:'JetBrains Mono',monospace;--sans:'Space Grotesk',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--white);font-family:var(--sans);font-size:16px;line-height:1.6;}
+a{color:var(--green);text-decoration:none;}
+.container{max-width:1080px;margin:0 auto;padding:0 24px;}
+nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:60px;}
+.logo{font-weight:700;font-size:15px;letter-spacing:0.08em;color:var(--white);}
+.logo span{color:var(--green);}
+.nav-links{display:flex;gap:24px;align-items:center;font-size:14px;}
+.nav-links a{color:var(--muted);}
+.nav-links a:hover{color:var(--white);}
+.btn{display:inline-block;background:var(--green);color:var(--black);font-weight:700;font-size:14px;letter-spacing:0.04em;padding:12px 22px;border-radius:4px;transition:opacity .15s;}
+.btn:hover{opacity:0.88;}
+.btn-outline{display:inline-block;border:1px solid var(--border-hot);color:var(--white);font-weight:600;font-size:14px;padding:12px 22px;border-radius:4px;transition:border-color .15s;}
+.btn-outline:hover{border-color:var(--green);}
+/* HERO */
+.hero{padding:88px 0 72px;text-align:center;background:radial-gradient(ellipse 60% 45% at 50% -10%,rgba(0,255,136,0.12),transparent);}
+.hero h1{font-size:clamp(30px,5.2vw,54px);font-weight:700;line-height:1.12;letter-spacing:-0.01em;max-width:820px;margin:0 auto 20px;}
+.hero h1 em{font-style:normal;color:var(--green);}
+.hero p{color:var(--muted);font-size:clamp(15px,2.2vw,19px);max-width:640px;margin:0 auto 32px;}
+.hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.hero-trust{margin-top:26px;font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;gap:18px;justify-content:center;flex-wrap:wrap;}
+.hero-trust span::before{content:"✓ ";color:var(--green);}
+/* SECTIONS */
+section{padding:72px 0;border-top:1px solid var(--border);}
+.section-tag{font-family:var(--mono);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--green);margin-bottom:12px;}
+h2{font-size:clamp(24px,3.6vw,34px);font-weight:700;line-height:1.2;margin-bottom:14px;}
+.section-sub{color:var(--muted);max-width:620px;margin-bottom:40px;}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:26px;}
+.step .num{font-family:var(--mono);font-size:12px;color:var(--green);border:1px solid rgba(0,255,136,0.3);background:var(--green-dim);display:inline-block;padding:3px 10px;border-radius:100px;margin-bottom:14px;}
+.step h3{font-size:17px;margin-bottom:8px;}
+.step p{color:var(--muted);font-size:14px;}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;}
+.feat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:22px;}
+.feat h3{font-size:15px;margin-bottom:6px;}
+.feat h3::before{content:"⚡";margin-right:8px;}
+.feat p{color:var(--muted);font-size:13.5px;}
+/* PRICING */
+.pricing{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;align-items:stretch;}
+.plan{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:28px;display:flex;flex-direction:column;}
+.plan.hot{border-color:rgba(0,255,136,0.45);background:linear-gradient(180deg,rgba(0,255,136,0.06),var(--surface) 45%);position:relative;}
+.plan .badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--green);color:var(--black);font-size:10px;font-weight:700;letter-spacing:0.1em;padding:4px 12px;border-radius:100px;font-family:var(--mono);}
+.plan h3{font-size:15px;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);}
+.plan .price{font-size:40px;font-weight:700;margin:10px 0 2px;}
+.plan .price small{font-size:14px;color:var(--muted);font-weight:400;}
+.plan ul{list-style:none;margin:20px 0 26px;flex:1;}
+.plan li{font-size:13.5px;color:var(--muted);padding:7px 0;border-bottom:1px dashed var(--border);}
+.plan li::before{content:"✓ ";color:var(--green);font-weight:700;}
+.plan .btn{width:100%;text-align:center;}
+/* FAQ + FOOTER */
+.faq{max-width:760px;}
+.faq details{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin-bottom:10px;}
+.faq summary{cursor:pointer;font-weight:600;font-size:14.5px;list-style:none;}
+.faq summary::marker{display:none;}
+.faq p{color:var(--muted);font-size:14px;margin-top:10px;}
+.cta-band{text-align:center;background:linear-gradient(180deg,var(--surface),var(--black));}
+.cta-band h2{margin-bottom:8px;}
+footer{border-top:1px solid var(--border);padding:34px 0;color:var(--muted);font-size:13px;}
+.footer-inner{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+@media(max-width:640px){.nav-links a:not(.btn){display:none;}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="container nav-inner">
+    <a class="logo" href="/">COAI <span>LEAD ENGINE</span></a>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn" href="/app">Open the app →</a>
+    </div>
+  </div>
+</nav>
+<section class="hero" id="top">
+  <div class="container">
+    <h1>Find local business leads in <em>minutes</em> — not days.</h1>
+    <p>COAI Lead Engine scans any city and industry using live Google Maps data, scores every lead, pulls contact details, and writes your outreach messages for you. Stop building lists by hand — start closing.</p>
+    <div class="hero-ctas">
+      <a class="btn" href="/app">Start free — 10 scans on us</a>
+      <a class="btn-outline" href="#pricing">See pricing</a>
+    </div>
+    <div class="hero-trust">
+      <span>No credit card required</span>
+      <span>Real-time Google Maps data</span>
+      <span>Export to CSV anytime</span>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="container">
+    <div class="section-tag">How it works</div>
+    <h2>From empty pipeline to first outreach in 3 steps</h2>
+    <p class="section-sub">Built for agency owners, web designers, and salespeople who need to talk to local businesses — without paying a data broker or copy-pasting from Google Maps all day.</p>
+    <div class="steps">
+      <div class="step">
+        <span class="num">01</span>
+        <h3>Scan a city + industry</h3>
+        <p>Pick any location and category — "dentists in Austin," "roofers in Miami" — and pull every matching business straight from live Google Maps data. Names, ratings, websites, phone numbers.</p>
+      </div>
+      <div class="step">
+        <span class="num">02</span>
+        <h3>Score &amp; qualify</h3>
+        <p>Every lead gets scored on signals that matter: no website, weak reviews, missing hours, unanswered phones. The engine surfaces the businesses that need you most — your best prospects.</p>
+      </div>
+      <div class="step">
+        <span class="num">03</span>
+        <h3>Reach out with AI</h3>
+        <p>Generate personalized outreach — emails, call scripts, and texts that reference each lead's actual pain points. Track every lead through your built-in CRM pipeline.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="container">
+    <div class="section-tag">Features</div>
+    <h2>Everything you need to land local clients</h2>
+    <p class="section-sub">One tool, the whole workflow — from finding the business to getting the reply.</p>
+    <div class="feat-grid">
+      <div class="feat"><h3>City &amp; industry scanning</h3><p>Live Google Maps data for any niche, any market. Fresh results every scan — no stale databases.</p></div>
+      <div class="feat"><h3>Lead scoring engine</h3><p>Pain-point signals ranked automatically so you call the businesses most likely to buy first.</p></div>
+      <div class="feat"><h3>Contact details</h3><p>Phone numbers, websites, ratings, and address data for every scanned business.</p></div>
+      <div class="feat"><h3>AI outreach writer</h3><p>Casual, professional, or direct — personalized emails and call scripts generated per lead.</p></div>
+      <div class="feat"><h3>Built-in CRM pipeline</h3><p>Drag leads through stages: new → contacted → negotiating → closed. Notes on every lead.</p></div>
+      <div class="feat"><h3>CSV export &amp; webhooks</h3><p>Take your data anywhere — spreadsheets, dialers, or your own systems via webhook.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="container">
+    <div class="section-tag">Pricing</div>
+    <h2>Start free. Upgrade when it pays for itself.</h2>
+    <p class="section-sub">Your first 10 scans are free — no credit card. One closed client covers a year of Pro.</p>
+    <div class="pricing">
+      <div class="plan">
+        <h3>Free</h3>
+        <div class="price">$0<small>/mo</small></div>
+        <ul>
+          <li>10 scans per month</li>
+          <li>Lead scoring &amp; contact details</li>
+          <li>CRM pipeline &amp; notes</li>
+          <li>CSV export</li>
+        </ul>
+        <a class="btn-outline" href="/app">Create free account</a>
+      </div>
+      <div class="plan hot">
+        <span class="badge">MOST POPULAR</span>
+        <h3>Starter</h3>
+        <div class="price">$49<small>/mo</small></div>
+        <ul>
+          <li>1,500 scans per month</li>
+          <li>Everything in Free</li>
+          <li>AI outreach generator</li>
+          <li>Webhook push</li>
+          <li>Cancel anytime</li>
+        </ul>
+        <a class="btn" href="/app">Get Starter</a>
+      </div>
+      <div class="plan">
+        <h3>Pro</h3>
+        <div class="price">$99<small>/mo</small></div>
+        <ul>
+          <li>5,000 scans per month</li>
+          <li>Everything in Starter</li>
+          <li>Heavy-duty prospecting</li>
+          <li>Priority support</li>
+          <li>Cancel anytime</li>
+        </ul>
+        <a class="btn-outline" href="/app">Get Pro</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="container">
+    <div class="section-tag">FAQ</div>
+    <h2>Questions, answered</h2>
+    <div class="faq">
+      <details><summary>Do I need my own Google Maps API key?</summary><p>No. COAI Lead Engine handles all Google Maps data on our servers — you never touch an API key or a Google Cloud bill. Your scans just work.</p></details>
+      <details><summary>What counts as a "scan"?</summary><p>A scan is one search of a city + industry — it returns every matching business with contact details, scores, and pain-point signals. One scan can surface dozens of leads.</p></details>
+      <details><summary>Is the data fresh?</summary><p>Yes — every scan runs against live Google Maps data at the moment you search, not a stale exported database that's months old.</p></details>
+      <details><summary>Can I cancel anytime?</summary><p>Yes. Manage or cancel your subscription yourself in one click from inside the app — no emails, no phone calls, no hoops.</p></details>
+      <details><summary>Can I export my leads?</summary><p>Always. Every plan (including Free) exports leads to CSV, so your data is yours.</p></details>
+      <details><summary>Who is this for?</summary><p>Agency owners, web designers, marketing consultants, and salespeople who sell to local businesses. If your customers are found on Google Maps, this finds them.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="container">
+    <h2>Your next 50 leads are one scan away.</h2>
+    <p class="section-sub" style="margin:0 auto 28px;">Create a free account and run your first scan in the next 5 minutes.</p>
+    <a class="btn" href="/app">Start scanning free →</a>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <div>© 2026 COAI Lead Engine · <a href="/app">Open the app</a> · <a href="/tos">Terms</a> · <a href="/privacy">Privacy</a></div>
+    <div>Built by Chaotically Organized AI</div>
+  </div>
+</footer>
+</body>
+</html>
+

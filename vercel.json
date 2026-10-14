@@ -18,10 +18,13 @@
     { "src": "tos.html", "use": "@vercel/static" },
     { "src": "privacy.html", "use": "@vercel/static" },
     { "src": "index.html",      "use": "@vercel/static" },
+    { "src": "landing.html",    "use": "@vercel/static" },
     { "src": "robots.txt",      "use": "@vercel/static" },
     { "src": "sitemap.xml",     "use": "@vercel/static" }
   ],
   "routes": [
+    { "src": "/", "dest": "/landing.html" },
+    { "src": "/app", "dest": "/index.html" },
     { "src": "/api/search",   "dest": "/api/search.js"   },
     { "src": "/api/scrape",   "dest": "/api/scrape.js"   },
     { "src": "/api/outreach", "dest": "/api/outreach.js" },
