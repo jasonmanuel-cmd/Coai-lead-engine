@@ -21,7 +21,12 @@ Customers now sign up with email/password (100 free scans/mo) and upgrade via **
 
 ### Launch checklist (do these before pushing to production)
 1. **Vercel Pro** — ✅ already on Pro.
-2. **Stripe** — create 2 recurring Products/Prices: Starter $49/mo, Pro $99/mo. Copy the `price_...` IDs.
+2. **Stripe** — ✅ DONE (2026-10-14, created via Composio in account `Chaotically Organized AI` / `acct_1ScKln0u37S56JoG`):
+   - Starter: product `prod_VRMMwVPzsShgeX`, price **`price_1UQTeN0u37S56JoGNneLXFfb`** ($49/mo recurring)
+   - Pro: product `prod_VRMM8OUoZKRcXv`, price **`price_1UQTeN0u37S56JoGmXYJ5Cqh`** ($99/mo recurring)
+   - Shareable payment links (for posting/sending directly):
+     - Starter: https://buy.stripe.com/fZu9ALfHH86z1Cy7kP5c401
+     - Pro: https://buy.stripe.com/eVqaEPdzzcmPa9420v5c402
    **OR/AND Square** — create subscription plans in Square (Dashboard → Items → Subscriptions): Starter $49/mo, Pro $99/mo, copy the plan variation IDs (`SQUARE_PLAN_VARIATION_*`).
 3. **Vercel env vars** (Dashboard → Settings → Environment Variables):
    - `DATABASE_URL` — already used by cron/stats; required for accounts. If not set, create a free Postgres (Neon/Vercel Postgres) and set it.
