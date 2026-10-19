@@ -26,7 +26,7 @@ github:
 
 # ===== coaihq.online Access =====
 coaihq:
-  password: "COAIGODMODE2026"
+  password: ""  # Set the COAI_PASSWORD env var; never commit it here
   base_url: "https://coaihq.online"
   # Auth: password set via prompt, sessionStorage.coai_auth = password
   # Provides: Lead Engine v2 (COAI Lead Engine v2 — God Mode Prospector)
@@ -34,7 +34,7 @@ coaihq:
 # ===== Cloudflare Access =====
 cloudflare:
   account_id: "90d28874d16643188318117e18074e3a"
-  api_token: "COAIGODMODE2026"
+  api_token: ""  # Set the CLOUDFLARE_API_TOKEN env var
   # When set, the agent will use Cloudflare Computer (Durable Objects)
   # to run browser automation for scraping Google Maps/DuckDuckGo
   # in isolated containers with real network access.

@@ -80,3 +80,11 @@ Still open (deliberately not built): email verification on signup, demo video em
 - `vercel project rm` has no `--yes` flag (pipe `echo y`); `vercel link --yes --project <name>` is safe
 - Production secrets pull as `[SENSITIVE]` placeholders — dev ≠ prod values
 - Stripe Workbench webhook UI flow: events first, then destination type "Webhook", then URL
+
+## Hardening pass (2026-10-19, later)
+- Crons: `lib/cron-auth.js` accepts `Bearer CRON_SECRET` (what Vercel sends), bare secret or `?secret=`; fails CLOSED if CRON_SECRET unset (was open).
+- Pipeline unblocked: discover fetches Place Details (phone/website, `place_id` dedupe column), audit uses https base URL + scrapes emails, qualify scores no-website leads and moves rejects to `audited`, outreach adds CAN-SPAM footer + unsubscribe suppression. **ACTION: set CRON_SECRET and OUTREACH_POSTAL_ADDRESS on Vercel.**
+- SSRF guard `lib/ssrf.js` on /api/audit, /api/scrape, /api/discover. CORS restricted to SITE_URL/coaihq.online. Webhook URL secrets compared timing-safe.
+- Stripe: real `current_period_end` from the subscription (was NOW()+1 month).
+- Removed hardcoded `COAIGODMODE2026` from Python/YAML (use env). **Rotate it anywhere it was real.** `.env.example` added.
+- Still open: Stripe raw-body signature verification (needs bodyParser off), redirect-based SSRF, unsubscribe is reply-based (no hosted link).

@@ -10,6 +10,7 @@
 
 const { query } = require('../lib/db');
 const { verifySquareSignature, squareApi } = require('../lib/saas');
+const { safeEqual } = require('../lib/cron-auth');
 
 const PLAN_VARIATION_ENV = {
   SQUARE_PLAN_VARIATION_STARTER: 'starter',
@@ -45,7 +46,7 @@ module.exports = async function handler(req, res) {
     const signatureOk = verifySquareSignature(
       rawBody, req.headers['x-square-hmacsha256-signature'], process.env.SQUARE_SIGNATURE_KEY
     );
-    const urlSecretOk = Boolean(urlSecret && querySecret && querySecret === urlSecret);
+    const urlSecretOk = Boolean(urlSecret && querySecret && safeEqual(querySecret, urlSecret));
 
     if (!signatureOk && !urlSecretOk) {
       console.error('square-webhook: auth failed (signatureOk=%s urlSecretOk=%s)', signatureOk, urlSecretOk);
