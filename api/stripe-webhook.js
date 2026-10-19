@@ -2,8 +2,9 @@
 //
 // Configure in Stripe Dashboard → Developers → Webhooks →
 //   URL:      https://coaihq.online/api/stripe-webhook?secret=<STRIPE_WEBHOOK_URL_SECRET>
-//   Events:   checkout.session.completed, customer.subscription.updated,
-//             customer.subscription.deleted, invoice.payment_failed
+//   Events:   checkout.session.completed, customer.subscription.created,
+//             customer.subscription.updated, customer.subscription.deleted,
+//             invoice.payment_failed
 //
 // Auth: verifies the Stripe signature when the raw body is available;
 // otherwise falls back to the ?secret= shared-secret URL (TLS-protected).
@@ -11,6 +12,19 @@
 const crypto = require('crypto');
 const { query } = require('../lib/db');
 const { verifyStripeSignature } = require('../lib/saas');
+
+// Map a Stripe subscription's price ID to a COAI plan.
+// (Metadata isn't reliable here: payment-link purchases carry none, and the
+// checkout Session object doesn't inherit subscription_data metadata.)
+function planFromSubscription(sub) {
+  try {
+    const items = (sub.items && sub.items.data) || [];
+    const priceIds = items.map(i => i.price && i.price.id).filter(Boolean);
+    if (priceIds.includes(process.env.STRIPE_PRICE_PRO)) return 'pro';
+    if (priceIds.includes(process.env.STRIPE_PRICE_STARTER)) return 'starter';
+  } catch { /* fall through to metadata */ }
+  return (sub.metadata && (sub.metadata.plan === 'pro' ? 'pro' : sub.metadata.plan === 'starter' ? 'starter' : null));
+}
 
 module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
@@ -49,7 +63,20 @@ module.exports = async function handler(req, res) {
         else console.warn('stripe-webhook: paid via payment link but no COAI account matches email', buyerEmail);
       }
       if (userId) {
-        const plan = (data.metadata && data.metadata.plan) || 'starter';
+        // The Session object rarely carries the plan, so ask Stripe for the
+        // subscription's price ID and map it — this is what makes Pro work.
+        let plan = (data.metadata && data.metadata.plan) || null;
+        if (!plan && data.subscription && process.env.STRIPE_SECRET_KEY) {
+          try {
+            const subResp = await fetch(
+              `https://api.stripe.com/v1/subscriptions/${data.subscription}`,
+              { headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` } }
+            );
+            const sub = await subResp.json();
+            if (!sub.error) plan = planFromSubscription(sub);
+          } catch (e) { console.warn('stripe-webhook: subscription lookup failed:', e.message); }
+        }
+        plan = plan === 'pro' ? 'pro' : 'starter';
         await query(
           `INSERT INTO subscriptions (user_id, stripe_customer_id, stripe_subscription_id, plan, status, current_period_end)
            VALUES ($1, $2, $3, $4, $5, NOW() + interval '1 month')
@@ -62,9 +89,10 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    if ((type === 'customer.subscription.updated' || type === 'customer.subscription.deleted') && data) {
+    if ((type === 'customer.subscription.created' || type === 'customer.subscription.updated' || type === 'customer.subscription.deleted') && data) {
       const status = type === 'customer.subscription.deleted' ? 'canceled' : data.status;
-      const plan = (data.metadata && data.metadata.plan) || null;
+      // Price ID wins (always present); metadata is only a fallback.
+      const plan = planFromSubscription(data) || (data.metadata && data.metadata.plan) || null;
       const periodEnd = data.current_period_end ? new Date(data.current_period_end * 1000) : null;
       await query(
         `UPDATE subscriptions SET status = $1,
