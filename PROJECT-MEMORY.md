@@ -55,6 +55,26 @@ Products/prices ✅ · env vars ✅ · webhook ✅ · portal ✅ · deployed ✅
 5. Dogfood: use the tool itself to find local businesses with bad websites → sell them web services
 6. Later: onboarding tour in-app, testimonials (real only), annual plans, /blog for SEO, Square as 2nd provider (Square connection to Composio is ACTIVE; code supports SQUARE_* env vars + square-webhook)
 
+## Sales-readiness audit fixes (2026-10-19)
+Branch `arena/cdaaea30-coai-lead-engine`. Found + fixed before selling:
+1. **Pro-plan bug (money!)** — `checkout.session.completed` read plan from session metadata (always empty → 'starter'), and `subscription.created` wasn't handled. Pro buyers got Starter quota. Now: price-ID → plan mapping + `subscription.created` handler + subscription lookup fallback. **ACTION: add `customer.subscription.created` to the Stripe webhook destination events.**
+2. **AI outreach dead for customers** — `generateAIOutreach()` required the owner key in sessionStorage; paying customers got an alert telling them to "run a scan to authenticate". Now uses the session cookie + passes the sender profile. Also fixed: server prompt was hardcoded to Jason's wholesale smoke-shop pitch with his real phone number — now generic, profile-driven (name/business/offer/tone from Settings).
+3. **Contact auto-enrich dead for customers** — `enrichAllLeads()` silently returned without the owner key. Now cookie-authenticated.
+4. **New-user identity leak** — default sender profile was Jason's real name/phone; any customer who skipped Settings sent outreach as Jason. Defaults are now blank with neutral fallbacks; price line is conditional (no more hardcoded "$1,200").
+5. **Quota honesty** — marketing said "scans", metering counts API calls (a full 40-lead scan ≈ 40+ calls). Landing FAQ/cards/JSON-LD, in-app pricing modal, and sidebar now say API calls with scan estimates (≈30+ Starter, ≈100+ Pro).
+6. **Wrong-city scans** — location defaulted to Bakersfield; geocode failures silently scanned Bakersfield coords. Now: empty input requires a city; geocode failure shows an error.
+7. **Misc**: `/app?upgraded=1` return URL no longer rewrites to `/`; "150+" → "100+ categories"; `/api/stats` is now owner-only; login/signup rate-limited; security headers in vercel.json; favicon + theme-color everywhere; real support email (chaoticallyorganizedai@gmail.com) in TOS/privacy/landing.
+Still open (deliberately not built): email verification on signup, demo video embed, testimonials, annual plans, raising free quota 10 → 50. Known issue: Vercel cron can't send the `Authorization: CRON_SECRET` header, so the 4 scheduled orchestrator jobs likely 401 — owner's private pipeline only; trigger manually or add query-secret support.
+
+## 10/10 pass (2026-10-19, same branch)
+- **Password reset**: `lib/email.js` mailer + `password_resets` table + `forgot`/`reset` actions in api/auth.js (rate-limited, anti-enumeration, 1-hour single-use tokens, auto-login after reset) + full UI (forgot link, reset mode via /app?reset=, Enter-to-submit). **ACTION: set EMAIL_USER + EMAIL_PASS on Vercel or resets silently can't send.**
+- **AI provider choice now works**: client sends preference, server honors it when that key is configured.
+- **Onboarding**: first-run welcome modal (3 steps + profile nudge), shown once after signup.
+- **Social image**: `og-image.png` (1200×630) generated + wired into landing/app meta, Vercel build/route.
+- **Mobile**: 640px breakpoint (header declutter, 2-col stats, stacked message types, wrapping action bars).
+- **Small UX**: usage meter refreshes after every scan; "Ready to Scan" empty state; signup auto-welcome.
+- **LAUNCH-KIT.md**: full marketing copy — video script, Reddit/LinkedIn/X/IndieHackers/PH posts, directory blurbs, dogfood DM scripts, 30-day calendar, payment links.
+
 ## Gotchas learned this session
 - Vercel CLI + PowerShell: `$` vars get eaten through cmd/powershell quoting layers → write .ps1 script files and run with `-File` instead
 - `vercel project rm` has no `--yes` flag (pipe `echo y`); `vercel link --yes --project <name>` is safe
