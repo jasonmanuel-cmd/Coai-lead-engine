@@ -34,6 +34,19 @@ function periodEndFromSubscription(sub) {
   return ts ? new Date(ts * 1000) : null;
 }
 
+// Map a Stripe subscription's price ID to a COAI plan.
+// (Metadata isn't reliable here: payment-link purchases carry none, and the
+// checkout Session object doesn't inherit subscription_data metadata.)
+function planFromSubscription(sub) {
+  try {
+    const items = (sub.items && sub.items.data) || [];
+    const priceIds = items.map(i => i.price && i.price.id).filter(Boolean);
+    if (priceIds.includes(process.env.STRIPE_PRICE_PRO)) return 'pro';
+    if (priceIds.includes(process.env.STRIPE_PRICE_STARTER)) return 'starter';
+  } catch { /* fall through to metadata */ }
+  return (sub.metadata && (sub.metadata.plan === 'pro' ? 'pro' : sub.metadata.plan === 'starter' ? 'starter' : null));
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed.' });
@@ -76,6 +89,7 @@ module.exports = async function handler(req, res) {
         let plan = (data.metadata && data.metadata.plan) || null;
         let periodEnd = null;
         if (data.subscription && process.env.STRIPE_SECRET_KEY) {
+        if (!plan && data.subscription && process.env.STRIPE_SECRET_KEY) {
           try {
             const subResp = await fetch(
               `https://api.stripe.com/v1/subscriptions/${data.subscription}`,
@@ -92,6 +106,10 @@ module.exports = async function handler(req, res) {
         // Fall back to a month out only if Stripe could not be asked; the
         // subscription.updated event later corrects it to the real date.
         const fallbackEnd = new Date(Date.now() + 31 * 864e5);
+            if (!sub.error) plan = planFromSubscription(sub);
+          } catch (e) { console.warn('stripe-webhook: subscription lookup failed:', e.message); }
+        }
+        plan = plan === 'pro' ? 'pro' : 'starter';
         await query(
           `INSERT INTO subscriptions (user_id, stripe_customer_id, stripe_subscription_id, plan, status, current_period_end)
            VALUES ($1, $2, $3, $4, $5, $6)
@@ -109,6 +127,7 @@ module.exports = async function handler(req, res) {
       // Price ID wins (always present); metadata is only a fallback.
       const plan = planFromSubscription(data) || (data.metadata && data.metadata.plan) || null;
       const periodEnd = periodEndFromSubscription(data);
+      const periodEnd = data.current_period_end ? new Date(data.current_period_end * 1000) : null;
       await query(
         `UPDATE subscriptions SET status = $1,
              plan = COALESCE($2, plan),
