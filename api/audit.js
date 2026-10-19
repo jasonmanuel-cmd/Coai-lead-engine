@@ -1,14 +1,18 @@
 // api/audit.js — lightweight website opportunity audit
 const { resolveCaller } = require('../lib/saas');
+const { assertPublicUrl } = require('../lib/ssrf');
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', process.env.SITE_URL || 'https://coaihq.online');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
   const caller=await resolveCaller(req);
   if(!caller)return res.status(401).json({error:'Unauthorized.'});
   const {url=''}=req.query;if(!/^https?:\/\//i.test(url))return res.status(400).json({error:'A full http(s) URL is required.'});
+  try{
+    await assertPublicUrl(url);
+  }catch(e){return res.status(400).json({error:e.message})}
   try{
     const started=Date.now();const r=await fetch(url,{redirect:'follow',headers:{'User-Agent':'Mozilla/5.0 Chrome/124 Safari/537.36'},signal:AbortSignal.timeout(15000)});const body=await r.text();const lower=body.toLowerCase();const visible=body.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').toLowerCase();const responseMs=Date.now()-started;
     const tests={reachable:r.ok,https:r.url.startsWith('https://'),title:/<title[^>]*>\s*[^<]{3,}/i.test(body),description:/<meta[^>]+name=["']description["'][^>]+content=["'][^"']{20,}/i.test(body)||/<meta[^>]+content=["'][^"']{20,}["'][^>]+name=["']description["']/i.test(body),viewport:/<meta[^>]+name=["']viewport["']/i.test(body),h1:(body.match(/<h1\b/gi)||[]).length,form:/<form\b/i.test(body),phoneLink:/href=["']tel:/i.test(body),schema:/application\/ld\+json/i.test(body),cta:/(get a quote|request a quote|book now|schedule|call now|free estimate|contact us)/i.test(visible),faq:/(frequently asked|\bfaq\b)/i.test(visible),analytics:/(googletagmanager|google-analytics|gtag\(|plausible\.io|matomo)/i.test(lower),responseMs,sizeKb:Math.round(Buffer.byteLength(body)/1024)};

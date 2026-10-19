@@ -22,9 +22,6 @@ import httpx
 
 CLOUDFLARE_ACCOUNT_ID = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
 CLOUDFLARE_API_TOKEN = os.environ.get("CLOUDFLARE_API_TOKEN", "")
-# The user provided "COAIGODMODE2026" as the Cloudflare API token/password
-if not CLOUDFLARE_API_TOKEN:
-    CLOUDFLARE_API_TOKEN = "COAIGODMODE2026"
 
 
 def _cf_base_url() -> str:

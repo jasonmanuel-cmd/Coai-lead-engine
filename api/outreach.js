@@ -12,45 +12,71 @@
 // Body:   { lead: <LeadObject>, type: 'text' | 'email' | 'voicemail' }
 // Returns: { message: string, provider: string, aiGenerated: boolean }
 
-function buildPrompt(lead, type) {
+function buildPrompt(lead, type, sender = {}) {
   const signals = [];
-  if (!lead.hasWebsite)                          signals.push('no website or online store');
+  if (!lead.hasWebsite)                          signals.push('no website listed on Google');
   if (lead.rating > 0 && lead.rating < 3.5)     signals.push(`only ${lead.rating} stars on Google`);
-  if (lead.rating === 0)                         signals.push('zero star rating on Google');
+  if (lead.rating === 0)                         signals.push('no star rating on Google');
   if (lead.reviews === 0)                        signals.push('zero customer reviews');
   else if (lead.reviews < 10)                    signals.push(`only ${lead.reviews} customer reviews`);
   if (!lead.hasPhone)                            signals.push('no phone number listed on Google');
-  const signalSummary = signals.length > 0 ? signals.join('; ') : 'likely struggling with supply and visibility';
+  const signalSummary = signals.length > 0 ? signals.join('; ') : 'an online presence that could be stronger';
+
+  // Sender profile comes from the customer's in-app Settings. Fall back to
+  // neutral placeholders so the message never leaks another user's identity.
+  const s = {
+    businessName: String(sender.businessName || '').trim(),
+    ownerName: String(sender.ownerName || '').trim(),
+    phone: String(sender.phone || '').trim(),
+    email: String(sender.email || '').trim(),
+    address: String(sender.address || '').trim(),
+    website: String(sender.website || '').trim(),
+    price: String(sender.price || '').trim(),
+    tone: ['casual', 'professional', 'direct'].includes(sender.tone) ? sender.tone : 'casual',
+  };
+  const who = s.ownerName || 'a local business consultant';
+  const biz = s.businessName || 'my agency';
+  const where = (s.address.split(',').pop() || '').trim() || 'your area';
+  const offer = s.price ? ` Their offer/pricing hook: "${s.price}".` : '';
+  const contactLine = [s.phone, s.email, s.website].filter(Boolean).join(' · ') || '(no contact info provided — end with a soft ask to reply instead of a callback number)';
+
+  const toneVoice = {
+    casual: 'Casual and human, like a fellow local business owner texting a neighbor. Short sentences, no corporate speak.',
+    professional: 'Professional and polished but warm — a trusted advisor, not a salesperson.',
+    direct: 'Direct and punchy. Lead with the observed problem and the cost of ignoring it. No fluff.',
+  }[s.tone];
 
   const formatInstructions = {
-    text:      'Write a SHORT text message / DM (max 90 words). Casual, direct, one clear ask at the end. Lead with the supply angle — you have products they need in stock NOW.',
-    email:     'Write a cold email. Include a Subject: line first. Body = 3 paragraphs max. Professional but human tone. End with one clear ask. Lead with the supply angle — you have products they need in stock NOW.',
-    voicemail: 'Write a voicemail script (~120 words, reads in under 60 seconds). Lead with the supply angle — you have products they need in stock NOW. Say the callback number (661) 610-9198 twice — once in the middle and once at the end.'
+    text:      'Write a SHORT text message / DM (max 90 words). One clear ask at the end.',
+    email:     'Write a cold email. Include a Subject: line first. Body = 3 short paragraphs max. End with one clear ask.',
+    voicemail: `Write a voicemail script (~120 words, reads in under 60 seconds).${s.phone ? ` Say the callback number ${s.phone} twice — once in the middle and once at the end.` : ''}`
   };
 
-  return `You are writing outreach ON BEHALF OF Jason Manuel, a wholesale smoke shop and head shop product supplier based in Bakersfield, CA.
+  return `You are writing cold outreach ON BEHALF OF ${who}${s.businessName ? ` with ${biz}` : ''}, who helps local businesses win more customers (typical services: websites, reviews, local SEO, lead generation, AI receptionists — adapt to the offer below if one is given).${offer}
 
-Jason's value proposition: He supplies smoke shops, head shops, vape shops, tobacco shops, CBD stores, and glass shops with the products they need — pipes, glass, vape accessories, tobacco products, CBD, kratom, hookah supplies, and more. He has inventory IN STOCK and ready to ship or deliver locally. He works with shops that are in a bind — low on supply, can't get products from their usual distributors, or just need a reliable local source. No minimums for local shops. Competitive wholesale pricing.
+SENDER:
+Name: ${who}
+Business: ${biz}
+Location: ${where}
+Contact: ${contactLine}
 
 TARGET BUSINESS:
 Name: ${lead.name}
 Industry: ${lead.cat}
-Location: ${lead.address || 'Bakersfield area'}
-What we know about them: ${signalSummary}
+Location: ${lead.address || 'their local area'}
+What we can observe about them: ${signalSummary}
 
 TASK: ${formatInstructions[type] || formatInstructions.text}
 
+VOICE: ${toneVoice}
+
 RULES:
-- You are a SUPPLIER reaching out to a RETAIL STORE — NOT a web dev or marketing pitch
-- Reference what you can see about their shop (low reviews, no website, etc.) as a signal they may need better supply to compete
-- Write from Jason's voice: direct, no fluff, no corporate speak, sounds like a fellow business owner
-- Never open with "I hope this finds you well" or any similar filler
-- Never say "I understand" or "That's great"
-- Sound like a supplier who has product ready to move, not a salesperson
-- Mention you have IN STOCK inventory ready to ship/deliver
-- Jason's phone: (661) 610-9198
-- Jason's location: Bakersfield, CA
-- Keep it short and actionable — the goal is to get them to call or reply
+- Reference the specific observation (missing website, low rating, few reviews, no phone) as the reason for reaching out
+- Make the pain concrete: missed calls, lost Google traffic, competitors winning the click
+- Offer a low-pressure next step (free audit / 10–15 minute call)
+- Never open with "I hope this finds you well" or similar filler
+- Never invent facts about the sender (no fake client counts, awards, or guarantees)
+- Keep it short and actionable — the goal is a reply or callback
 
 OUTPUT: The message text only. No preamble, no quotes, no explanation.`;
 }
@@ -103,7 +129,7 @@ async function callAnthropic(prompt) {
   return data.content[0].text.trim();
 }
 
-function chooseProvider() {
+function chooseProvider(clientPreferred) {
   const configured = [];
   if (process.env.GEMINI_API_KEY) configured.push('gemini');
   if (process.env.PERPLEXITY_API_KEY) configured.push('perplexity');
@@ -111,26 +137,25 @@ function chooseProvider() {
 
   if (configured.length === 0) return null;
 
-  const preferred = process.env.AI_PROVIDER || 'gemini';
-  if (configured.includes(preferred)) return preferred;
+  // The customer's in-app AI choice wins if that key exists on the server,
+  // then the server default, then whatever is configured.
+  const candidates = [clientPreferred, process.env.AI_PROVIDER || 'gemini'];
+  for (const c of candidates) {
+    if (c && configured.includes(c)) return c;
+  }
   return configured[0];
 }
 
 const { resolveCaller } = require('../lib/saas');
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', process.env.SITE_URL || 'https://coaihq.online');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const caller = await resolveCaller(req);
   if (!caller) return res.status(401).json({ error: 'Unauthorized' });
-
-  const provider = chooseProvider();
-  if (!provider) {
-    return res.status(200).json({ fallback: true, reason: 'No AI provider configured — using static template.', provider: null });
-  }
 
   let body = {};
   try {
@@ -139,10 +164,15 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid JSON body.' });
   }
 
-  const { lead, type } = body;
+  const provider = chooseProvider(body.provider);
+  if (!provider) {
+    return res.status(200).json({ fallback: true, reason: 'No AI provider configured — using static template.', provider: null });
+  }
+
+  const { lead, type, sender } = body;
   if (!lead || !type) return res.status(400).json({ error: 'lead and type are required.' });
 
-  const prompt = buildPrompt(lead, type);
+  const prompt = buildPrompt(lead, type, sender && typeof sender === 'object' ? sender : {});
 
   try {
     let message;

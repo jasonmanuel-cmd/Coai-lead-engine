@@ -1,8 +1,9 @@
 // api/discover.js — cautious website discovery and verification
 const { resolveCaller } = require('../lib/saas');
+const { assertPublicUrl } = require('../lib/ssrf');
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', process.env.SITE_URL || 'https://coaihq.online');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -29,6 +30,7 @@ module.exports = async function handler(req, res) {
   async function verify(item) {
     try {
       const started=Date.now();
+      await assertPublicUrl(item.url);
       const r=await fetch(item.url,{redirect:'follow',headers:{'User-Agent':'Mozilla/5.0 Chrome/124 Safari/537.36'},signal:AbortSignal.timeout(12000)});
       const html=await r.text(); const text=html.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').toLowerCase();
       const host=new URL(r.url).hostname.toLowerCase().replace(/^www\./,''); let score=0; const evidence=[]; const exact=String(name).toLowerCase();

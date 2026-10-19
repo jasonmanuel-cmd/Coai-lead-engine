@@ -2,8 +2,9 @@
 //
 // Configure in Stripe Dashboard → Developers → Webhooks →
 //   URL:      https://coaihq.online/api/stripe-webhook?secret=<STRIPE_WEBHOOK_URL_SECRET>
-//   Events:   checkout.session.completed, customer.subscription.updated,
-//             customer.subscription.deleted, invoice.payment_failed
+//   Events:   checkout.session.completed, customer.subscription.created,
+//             customer.subscription.updated, customer.subscription.deleted,
+//             invoice.payment_failed
 //
 // Auth: verifies the Stripe signature when the raw body is available;
 // otherwise falls back to the ?secret= shared-secret URL (TLS-protected).
@@ -11,6 +12,27 @@
 const crypto = require('crypto');
 const { query } = require('../lib/db');
 const { verifyStripeSignature } = require('../lib/saas');
+const { safeEqual } = require('../lib/cron-auth');
+
+// Map a Stripe subscription's price ID to a COAI plan.
+// (Metadata isn't reliable here: payment-link purchases carry none, and the
+// checkout Session object doesn't inherit subscription_data metadata.)
+function planFromSubscription(sub) {
+  try {
+    const items = (sub.items && sub.items.data) || [];
+    const priceIds = items.map(i => i.price && i.price.id).filter(Boolean);
+    if (priceIds.includes(process.env.STRIPE_PRICE_PRO)) return 'pro';
+    if (priceIds.includes(process.env.STRIPE_PRICE_STARTER)) return 'starter';
+  } catch { /* fall through to metadata */ }
+  return (sub.metadata && (sub.metadata.plan === 'pro' ? 'pro' : sub.metadata.plan === 'starter' ? 'starter' : null));
+}
+
+// Real period end in a Date: top-level on older API versions, per-item on newer ones.
+function periodEndFromSubscription(sub) {
+  const ts = (sub && sub.current_period_end) ||
+    (sub && sub.items && sub.items.data && sub.items.data[0] && sub.items.data[0].current_period_end);
+  return ts ? new Date(ts * 1000) : null;
+}
 
 module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
@@ -25,7 +47,7 @@ module.exports = async function handler(req, res) {
     const signatureOk = verifyStripeSignature(
       rawBody, req.headers['stripe-signature'], process.env.STRIPE_WEBHOOK_SECRET
     );
-    const urlSecretOk = Boolean(urlSecret && querySecret && querySecret === urlSecret);
+    const urlSecretOk = Boolean(urlSecret && querySecret && safeEqual(querySecret, urlSecret));
 
     if (!signatureOk && !urlSecretOk) {
       console.error('stripe-webhook: auth failed (signatureOk=%s urlSecretOk=%s). Configure STRIPE_WEBHOOK_SECRET or STRIPE_WEBHOOK_URL_SECRET.',
@@ -49,23 +71,44 @@ module.exports = async function handler(req, res) {
         else console.warn('stripe-webhook: paid via payment link but no COAI account matches email', buyerEmail);
       }
       if (userId) {
-        const plan = (data.metadata && data.metadata.plan) || 'starter';
+        // The Session object rarely carries the plan, so ask Stripe for the
+        // subscription's price ID and map it — this is what makes Pro work.
+        let plan = (data.metadata && data.metadata.plan) || null;
+        let periodEnd = null;
+        if (data.subscription && process.env.STRIPE_SECRET_KEY) {
+          try {
+            const subResp = await fetch(
+              `https://api.stripe.com/v1/subscriptions/${data.subscription}`,
+              { headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` } }
+            );
+            const sub = await subResp.json();
+            if (!sub.error) {
+              plan = planFromSubscription(sub) || plan;
+              periodEnd = periodEndFromSubscription(sub);
+            }
+          } catch (e) { console.warn('stripe-webhook: subscription lookup failed:', e.message); }
+        }
+        plan = plan === 'pro' ? 'pro' : 'starter';
+        // Fall back to a month out only if Stripe could not be asked; the
+        // subscription.updated event later corrects it to the real date.
+        const fallbackEnd = new Date(Date.now() + 31 * 864e5);
         await query(
           `INSERT INTO subscriptions (user_id, stripe_customer_id, stripe_subscription_id, plan, status, current_period_end)
-           VALUES ($1, $2, $3, $4, $5, NOW() + interval '1 month')
+           VALUES ($1, $2, $3, $4, $5, $6)
            ON CONFLICT (user_id) DO UPDATE SET
              stripe_customer_id = $2, stripe_subscription_id = $3,
-             plan = $4, status = $5, current_period_end = NOW() + interval '1 month', updated_at = NOW()`,
-          [userId, data.customer, data.subscription, plan, 'active']
+             plan = $4, status = $5, current_period_end = $6, updated_at = NOW()`,
+          [userId, data.customer, data.subscription, plan, 'active', periodEnd || fallbackEnd]
         );
         await query('UPDATE users SET stripe_customer_id = $1 WHERE id = $2', [data.customer, userId]);
       }
     }
 
-    if ((type === 'customer.subscription.updated' || type === 'customer.subscription.deleted') && data) {
+    if ((type === 'customer.subscription.created' || type === 'customer.subscription.updated' || type === 'customer.subscription.deleted') && data) {
       const status = type === 'customer.subscription.deleted' ? 'canceled' : data.status;
-      const plan = (data.metadata && data.metadata.plan) || null;
-      const periodEnd = data.current_period_end ? new Date(data.current_period_end * 1000) : null;
+      // Price ID wins (always present); metadata is only a fallback.
+      const plan = planFromSubscription(data) || (data.metadata && data.metadata.plan) || null;
+      const periodEnd = periodEndFromSubscription(data);
       await query(
         `UPDATE subscriptions SET status = $1,
              plan = COALESCE($2, plan),

@@ -16,9 +16,10 @@ const { escalate } = require('./scrape/pipeline/escalation');
 const { isAllowed } = require('./scrape/utils/robots');
 const { detectCaptcha } = require('./scrape/transport/captcha');
 const { resolveCaller } = require('../lib/saas');
+const { assertPublicUrl } = require('../lib/ssrf');
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', process.env.SITE_URL || 'https://coaihq.online');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization');
   res.setHeader('X-Robots-Tag', 'noindex');
@@ -31,6 +32,12 @@ module.exports = async function handler(req, res) {
 
   const { url, skip_levels } = req.query;
   if (!url) return res.status(400).json({ error: 'url param required' });
+
+  try {
+    await assertPublicUrl(/^https?:\/\//i.test(url) ? url : 'https://' + url);
+  } catch (e) {
+    return res.status(400).json({ error: e.message });
+  }
 
   const skipLevels = skip_levels
     ? String(skip_levels).split(',').map(Number).filter(n => n >= 1 && n <= 3)

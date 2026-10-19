@@ -7,9 +7,9 @@ node_modules/
 .env.local
 .env.*.local
 .env.txt
-.env.example
 .vercel
 .env*
 
 __pycache__/
 *.pyc
+!.env.example
