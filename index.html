@@ -14,6 +14,8 @@
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="COAI Lead Engine — Local Business Lead Finder"/>
 <meta name="twitter:description" content="Scan any city or industry for local business leads, score them, and reach out with AI-generated messages. Free to start."/>
+<meta name="theme-color" content="#0a0a0a"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a0a0a'/%3E%3Ctext x='32' y='44' font-family='monospace' font-size='36' font-weight='bold' text-anchor='middle' fill='%2300ff88'%3E⚡%3C/text%3E%3C/svg%3E"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
@@ -352,16 +354,16 @@ summary:focus-visible,
     <div class="sidebar-section">
       <div class="field">
         <label>City / Area</label>
-        <input type="text" id="location" value="Bakersfield, CA" placeholder="City, State"/>
+        <input type="text" id="location" value="" placeholder="City, State — e.g. Austin, TX"/>
       </div>
       <div class="field">
         <label>Radius</label>
         <select id="radius">
-          <option value="2000">2 miles — Core 661</option>
-          <option value="5000" selected>5 miles — Greater Bakersfield</option>
-          <option value="10000">10 miles — Kern County</option>
-          <option value="25000">25 miles — Central Valley</option>
-          <option value="50000">50 miles — Max Range</option>
+          <option value="2000">2 miles — City core</option>
+          <option value="5000" selected>5 miles — City + nearby</option>
+          <option value="10000">10 miles — Metro area</option>
+          <option value="25000">25 miles — Greater metro</option>
+          <option value="50000">50 miles — Max range</option>
         </select>
       </div>
     </div>
@@ -810,7 +812,7 @@ summary:focus-visible,
       <div id="account-logged-out" style="display:flex;flex-direction:column;gap:7px;">
         <button class="search-btn" style="font-size:11px;" onclick="openAuthModal('login')">⭕ LOG IN</button>
         <button class="gsr-btn" style="font-size:10px;" onclick="openAuthModal('signup')">⚡ Create free account — 10 free scans</button>
-        <small style="color:var(--muted);">Free accounts get 10 scans/month to try it out — upgrade to Starter ($49/mo) or Pro ($99/mo) for more. The Google API key stays server-side — never exposed to the browser.</small>
+        <small style="color:var(--muted);">Free accounts get 10 API calls/month — enough for a first real scan. Upgrade to Starter ($49/mo) or Pro ($99/mo) for more. The Google API key stays server-side — never exposed to the browser.</small>
       </div>
       <div id="account-logged-in" style="display:none;flex-direction:column;gap:7px;">
         <div class="session-stat"><span style="color:var(--muted);">Account</span><span id="acct-email" style="color:var(--white);font-family:var(--mono);font-size:10px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span></div>
@@ -908,7 +910,7 @@ summary:focus-visible,
       <div class="empty-state" id="empty-state">
         <div class="empty-icon">◉</div>
         <div class="empty-title">God Mode Ready</div>
-        <p class="empty-sub">Pick industries, set radius, scan. Finds smoke shops, head shops, vape shops, and more. Each result is enriched with Google Place Details (phone + website) so you can reach out immediately.</p>
+        <p class="empty-sub">Pick industries, set radius, scan. Finds any local businesses — dentists, roofers, restaurants, law firms, shops, and 100+ more categories. Each result is enriched with Google Place Details (phone + website) so you can reach out immediately.</p>
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.2rem;margin-top:1rem;max-width:340px;text-align:left;">
           <div style="font-family:var(--mono);font-size:9px;color:var(--green);letter-spacing:0.14em;margin-bottom:0.75rem;">HOT LEAD SIGNALS</div>
           <div style="font-size:12px;color:var(--muted);line-height:2.1;">
@@ -1074,8 +1076,8 @@ summary:focus-visible,
           <div style="font-weight:700;letter-spacing:1px;">STARTER</div>
           <div style="font-family:var(--mono);font-size:24px;color:var(--green);margin:6px 0;">$49<span style="font-size:11px;color:var(--muted);">/month</span></div>
           <ul style="font-size:11px;color:var(--muted);list-style:none;margin:10px 0;display:flex;flex-direction:column;gap:5px;">
-            <li>✓ 1,500 API calls / month</li>
-            <li>✓ Full industry library (150+)</li>
+            <li>✓ 1,500 API calls / month (≈ 30+ full scans)</li>
+            <li>✓ Full industry library (100+ categories)</li>
             <li>✓ CSV export + webhook push</li>
             <li>✓ AI outreach generator</li>
             <li>✓ Opportunity scoring</li>
@@ -1087,7 +1089,7 @@ summary:focus-visible,
           <div style="font-weight:700;letter-spacing:1px;">PRO 🔥</div>
           <div style="font-family:var(--mono);font-size:24px;color:var(--green);margin:6px 0;">$99<span style="font-size:11px;color:var(--muted);">/month</span></div>
           <ul style="font-size:11px;color:var(--muted);list-style:none;margin:10px 0;display:flex;flex-direction:column;gap:5px;">
-            <li>✓ 5,000 API calls / month</li>
+            <li>✓ 5,000 API calls / month (≈ 100+ full scans)</li>
             <li>✓ Everything in Starter</li>
             <li>✓ Priority scan queue</li>
             <li>✓ All radius tiers (50mi)</li>
@@ -1119,6 +1121,7 @@ summary:focus-visible,
       </div>
       <div class="sidebar-label" style="margin-bottom:0.75rem;">Message Preview</div>
       <div class="msg-preview" id="msg-preview"></div>
+      <small style="color:var(--muted);display:block;margin:-6px 0 12px;">Tip: set your name, business &amp; offer in ⚙ Settings so every message sounds like you.</small>
       <div class="modal-actions">
         <button class="copy-btn" onclick="copyMsg()">Copy Message</button>
         <button class="dismiss-btn" id="ai-gen-btn" onclick="generateAIOutreach()" style="border-color:rgba(167,139,250,0.4);color:#a78bfa;">⚡ AI Personalize</button>
@@ -1138,8 +1141,8 @@ summary:focus-visible,
   </div>
   <div class="settings-body">
     <div class="field">
-      <label>Business / Supplier Name</label>
-      <input type="text" id="set-business-name" placeholder="Your name or business"/>
+      <label>Business Name</label>
+      <input type="text" id="set-business-name" placeholder="Your business name"/>
     </div>
     <div class="field">
       <label>Owner / Rep Name</label>
@@ -1163,7 +1166,7 @@ summary:focus-visible,
     </div>
     <div class="field">
       <label>Pricing / Offer</label>
-      <input type="text" id="set-price" placeholder="Wholesale pricing"/>
+      <input type="text" id="set-price" placeholder="e.g. Websites starting at $500"/>
     </div>
     <div class="field">
       <label>Outreach Tone</label>
@@ -1180,7 +1183,7 @@ summary:focus-visible,
         <option value="perplexity">Perplexity</option>
         <option value="anthropic">Anthropic Claude</option>
       </select>
-      <small>Used for AI outreach personalization. Set the API key in Vercel env vars.</small>
+      <small>AI personalization runs on our servers — no setup needed. Your profile above is what the AI writes with.</small>
     </div>
   </div>
   <div class="settings-footer">
@@ -1217,13 +1220,13 @@ function escapeHtml(str){
 }
 
 const DEFAULT_SETTINGS = {
-  businessName: 'Jason Manuel Wholesale',
-  ownerName: 'Jason',
-  phone: '(661) 610-9198',
+  businessName: '',
+  ownerName: '',
+  phone: '',
   email: '',
-  address: 'Bakersfield, CA',
+  address: '',
   website: '',
-  price: 'Wholesale Pricing',
+  price: '',
   tone: 'casual',
   aiProvider: 'gemini'
 };
@@ -1734,14 +1737,14 @@ document.addEventListener('DOMContentLoaded', () => {
   refreshAccount();
   const params = new URLSearchParams(window.location.search);
   if(params.get('upgraded') === '1'){
-    history.replaceState(null, '', '/');
+    history.replaceState(null, '', '/app');
     setTimeout(async () => {
       await refreshAccount();
       alert('⚡ Payment complete — your plan is active. Welcome aboard!');
     }, 2000);
   }
   if(params.get('canceled') === '1'){
-    history.replaceState(null, '', '/');
+    history.replaceState(null, '', '/app');
   }
 });
 
@@ -1949,7 +1952,8 @@ async function runSearch(){
   if(!adminKey && !accountState){ openAuthModal('login'); return; }
   if(activeCats.size === 0){alert('Select at least one industry category.');return;}
 
-  const location = document.getElementById('location').value.trim() || 'Bakersfield, CA';
+  const location = document.getElementById('location').value.trim();
+  if(!location){ alert('Enter a city or area first — e.g. "Austin, TX".'); return; }
   const radius = document.getElementById('radius').value;
   const opts = getSearchOptions();
   const resultsCount = opts.resultsCount;
@@ -1996,6 +2000,8 @@ async function runSearch(){
       if(geo.results && geo.results.length > 0){
         lat = geo.results[0].geometry.location.lat;
         lng = geo.results[0].geometry.location.lng;
+      }else{
+        throw new Error('GEOCODE_EMPTY');
       }
     }catch(geoErr){
       if(geoErr.quota || geoErr.message.includes('QUOTA_EXCEEDED')){
@@ -2016,7 +2022,12 @@ async function runSearch(){
         }
         return;
       }
-      console.warn('Geocode failed, using Bakersfield default:', geoErr.message);
+      // Never silently scan somewhere the user didn't ask for.
+      document.getElementById('loading-wrap').style.display = 'none';
+      document.getElementById('empty-state').style.display = 'flex';
+      document.getElementById('search-btn').disabled = false;
+      alert('Could not find "' + location + '". Check the spelling and try "City, State" format.');
+      return;
     }
 
     const cats = Array.from(activeCats);
@@ -2506,10 +2517,11 @@ function generateMsg(lead, type){
   const location = (s.address || '').split(',').pop()?.trim() || 'your area';
   const bizShort = s.businessName || 'our agency';
 
+  const priceBit = s.price ? ` starting at ${s.price}` : '';
   const greeting = {
-    casual: `Hey, I noticed ${lead.name} has ${pain}. I'm ${s.ownerName || 'your rep'} with ${s.businessName || 'our team'} here in ${location} — we build websites and AI systems for local businesses like yours starting at ${s.price || '$1,200'}, and you own everything outright. No monthly fees. Would you be open to a free 10-minute audit call? ${s.phone || ''}`,
-    professional: `Hello, I came across ${lead.name} while researching ${lead.cat} businesses in ${location} and noticed ${pain}. My name is ${s.ownerName || 'a business consultant'} with ${s.businessName || 'a local agency'}. We specialize in helping businesses like yours improve their online presence — starting at ${s.price || '$1,200'} with full ownership and no recurring platform fees.\n\nI'd love to schedule a brief 15-minute consultation to discuss how we can help you capture more leads. Please feel free to reach out at ${s.phone || 'the number above'}.\n\nBest regards,\n${s.ownerName || 'Team'}\n${s.businessName || ''}`,
-    direct: `${lead.name} has ${pain}. That's costing you leads every day. ${s.ownerName || 'We'} with ${s.businessName || 'our agency'} fix this. We build websites and AI systems starting at ${s.price || '$1,200'} — you own it, no monthly fees. Want a free 10-minute audit to see exactly what you're missing? ${s.phone || 'Reply to this message'}`
+    casual: `Hey, I noticed ${lead.name} has ${pain}. I'm ${s.ownerName || 'a local consultant'} with ${s.businessName || 'my agency'} here in ${location} — we build websites and AI systems for local businesses like yours${s.price ? `, starting at ${s.price}` : ''}. You own everything outright, no monthly platform fees. Would you be open to a free 10-minute audit call? ${s.phone || ''}`,
+    professional: `Hello, I came across ${lead.name} while researching ${lead.cat} businesses in ${location} and noticed ${pain}. My name is ${s.ownerName || 'a business consultant'} with ${s.businessName || 'a local agency'}. We specialize in helping businesses like yours improve their online presence${s.price ? ` — packages starting at ${s.price} —` : ''} with full ownership and no recurring platform fees.\n\nI'd love to schedule a brief 15-minute consultation to discuss how we can help you capture more leads. Please feel free to reach out at ${s.phone || 'the number above'}.\n\nBest regards,\n${s.ownerName || 'Team'}\n${s.businessName || ''}`,
+    direct: `${lead.name} has ${pain}. That's costing you leads every day. ${s.ownerName || 'We'} with ${s.businessName || 'our agency'} fix this. We build websites and AI systems${priceBit} — you own it, no monthly fees. Want a free 10-minute audit to see exactly what you're missing? ${s.phone || 'Reply to this message'}`
   };
 
   if(type === 'text'){
@@ -2522,7 +2534,7 @@ Hi there,
 
 I was searching for ${lead.cat} businesses in ${location} and noticed ${lead.name} has ${pain}.
 
-I'm ${s.ownerName || 'your rep'}, ${tone === 'professional' ? 'representing' : 'founder of'} ${s.businessName || 'a local agency'} (${s.website || 'our site'}). We build sovereign websites and AI lead capture systems for local service businesses — starting at ${s.price || '$1,200'} with full ownership and zero monthly platform fees.
+I'm ${s.ownerName || 'a local consultant'}, ${tone === 'professional' ? 'representing' : 'founder of'} ${s.businessName || 'a local agency'}${s.website ? ` (${s.website})` : ''}. We build websites and AI lead capture systems for local service businesses${s.price ? ` — starting at ${s.price}` : ''} with full ownership and zero monthly platform fees.
 
 I'd love to do a free 15-minute audit of your current online presence and show you exactly what it's costing you in missed leads.
 
@@ -2667,10 +2679,9 @@ async function generateAIOutreach(){
   const btn = document.getElementById('ai-gen-btn');
   const preview = document.getElementById('msg-preview');
   const authKey = sessionStorage.getItem('coai_auth') || '';
-  if(!authKey){
-    alert('Run a scan first to authenticate — this sets your session key for AI calls.');
-    return;
-  }
+  // Auth works two ways: owner key header OR logged-in session cookie
+  // (same-origin fetch sends the cookie automatically).
+  if(!authKey && !accountState){ openAuthModal('login'); return; }
   btn.textContent = '⚡ Generating…';
   btn.disabled = true;
   try{
@@ -2680,9 +2691,23 @@ async function generateAIOutreach(){
         'Authorization': authKey,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ lead: activeLead, type: msgType }),
-      signal: AbortSignal.timeout(15000)
+      body: JSON.stringify({
+        lead: {
+          name: activeLead.name, cat: activeLead.cat, address: activeLead.address,
+          rating: activeLead.rating, reviews: activeLead.reviews,
+          hasWebsite: activeLead.hasWebsite, hasPhone: activeLead.hasPhone
+        },
+        type: msgType,
+        sender: {
+          businessName: appSettings.businessName, ownerName: appSettings.ownerName,
+          phone: appSettings.phone, email: appSettings.email,
+          address: appSettings.address, website: appSettings.website,
+          price: appSettings.price, tone: appSettings.tone
+        }
+      }),
+      signal: AbortSignal.timeout(20000)
     });
+    if(resp.status === 401){ openAuthModal('login'); btn.textContent = '⚡ AI Personalize'; btn.disabled = false; return; }
     const data = await resp.json();
     if(data.fallback){
       // No AI key configured or call failed — use static template silently
@@ -2875,8 +2900,10 @@ function handleCRMImportFile(input){
 
 // ─── CONTACT ENRICHMENT ───
 async function enrichAllLeads(){
-  const authKey = sessionStorage.getItem('coai_auth');
-  if(!authKey) return;
+  // Logged-in customers authenticate via session cookie (same-origin fetch
+  // sends it automatically); the owner key header is only a fallback.
+  const authKey = sessionStorage.getItem('coai_auth') || '';
+  if(!authKey && !accountState) return;
 
   const leadsWithSites = allLeads.filter(l => l.hasWebsite && !l.enriched);
   if(leadsWithSites.length === 0) return;

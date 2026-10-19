@@ -12,6 +12,10 @@ module.exports = async (req, res) => {
   if (!caller) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
+  // Owner-only: this exposes the private orchestrator pipeline, not customer data.
+  if (!caller.admin) {
+    return res.status(403).json({ error: 'Owner access only.' });
+  }
 
   try {
     await initSchema();

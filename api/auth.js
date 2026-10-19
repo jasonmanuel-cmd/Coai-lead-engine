@@ -10,6 +10,25 @@ const {
 } = require('../lib/saas');
 const { query } = require('../lib/db');
 
+// Lightweight in-memory rate limiter for login/signup (per serverless instance).
+// Raises the bar against credential-stuffing and mass fake-account creation.
+const _attempts = new Map(); // key -> { count, resetAt }
+function rateLimited(key, max = 12, windowMs = 10 * 60 * 1000) {
+  const now = Date.now();
+  const rec = _attempts.get(key);
+  if (!rec || now > rec.resetAt) {
+    _attempts.set(key, { count: 1, resetAt: now + windowMs });
+    return false;
+  }
+  rec.count += 1;
+  if (_attempts.size > 5000) _attempts.clear(); // memory safety
+  return rec.count > max;
+}
+function clientIp(req) {
+  const fwd = req.headers['x-forwarded-for'] || '';
+  return String(fwd).split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
+}
+
 function json(res, code, body, extraHeaders = {}) {
   res.setHeader('Content-Type', 'application/json');
   for (const [k, v] of Object.entries(extraHeaders)) res.setHeader(k, v);
@@ -55,6 +74,9 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === 'signup') {
+      if (rateLimited(`signup:${clientIp(req)}`, 8)) {
+        return json(res, 429, { error: 'Too many signups from this network. Please wait a few minutes and try again.' });
+      }
       if (!emailNorm || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailNorm)) {
         return json(res, 400, { error: 'A valid email address is required.' });
       }
@@ -81,6 +103,9 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === 'login') {
+      if (rateLimited(`login:${clientIp(req)}:${emailNorm}`, 12)) {
+        return json(res, 429, { error: 'Too many login attempts. Please wait a few minutes and try again.' });
+      }
       if (!emailNorm || !password) return json(res, 400, { error: 'Email and password are required.' });
       const found = await query(
         'SELECT id, email, name, password_hash FROM users WHERE email = $1', [emailNorm]
