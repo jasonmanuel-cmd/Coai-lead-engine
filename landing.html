@@ -248,8 +248,21 @@ footer{border-top:1px solid var(--border);padding:34px 0;color:var(--muted);font
   </div>
 </footer>
 <script>
+  // Campaign tags: keep the utm_* tags a visitor arrived with (for 30 days) so a
+  // signup or paid plan can be credited to the ad or post that brought them.
+  function coaiUtm() {
+    var keys = ['utm_source', 'utm_medium', 'utm_campaign'], found = {}, any = false;
+    try {
+      var q = new URLSearchParams(location.search);
+      keys.forEach(function (k) { var v = q.get(k); if (v) { found[k] = v.slice(0, 100); any = true; } });
+      if (any) { localStorage.setItem('coai_utm', JSON.stringify({ tags: found, at: Date.now() })); return found; }
+      var saved = JSON.parse(localStorage.getItem('coai_utm') || 'null');
+      if (saved && Date.now() - saved.at < 30 * 864e5) return saved.tags;
+    } catch (e) {}
+    return {};
+  }
   try {
-    navigator.sendBeacon('/api/track', new Blob([JSON.stringify({ path: 'landing', ref: document.referrer || '' })], { type: 'application/json' }));
+    navigator.sendBeacon('/api/track', new Blob([JSON.stringify({ path: 'landing', ref: document.referrer || '', utm: coaiUtm() })], { type: 'application/json' }));
   } catch (e) {}
 </script>
 </body>

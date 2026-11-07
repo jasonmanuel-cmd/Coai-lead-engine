@@ -11,6 +11,7 @@
 
 const crypto = require('crypto');
 const { query } = require('../lib/db');
+const { recordEvent } = require('../lib/events');
 const { verifyStripeSignature } = require('../lib/saas');
 const { safeEqual } = require('../lib/cron-auth');
 
@@ -101,6 +102,8 @@ module.exports = async function handler(req, res) {
           [userId, data.customer, data.subscription, plan, 'active', periodEnd || fallbackEnd]
         );
         await query('UPDATE users SET stripe_customer_id = $1 WHERE id = $2', [data.customer, userId]);
+        // Funnel: one 'upgrade' per paid checkout (session id dedupes webhook retries)
+        await recordEvent('upgrade', { userId, plan, extId: data.id });
       }
     }
 

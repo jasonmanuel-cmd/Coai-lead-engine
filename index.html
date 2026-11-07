@@ -1784,7 +1784,7 @@ async function submitAuth(){
     const resp = await fetch('/api/auth', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: authMode, email, password, name })
+      body: JSON.stringify({ action: authMode, email, password, name, utm: (typeof coaiUtm === 'function' ? coaiUtm() : {}) })
     });
     const data = await resp.json().catch(()=>({}));
     if(!resp.ok) return fail(data.error || 'Something went wrong. Try again.');
@@ -3449,14 +3449,36 @@ async function loadAnalytics(){
     el.innerHTML = 'Today: <span style="color:var(--green);">' + a.today + '</span> · 7d: ' + a.last7days +
       ' · 30d: ' + a.last30days + ' · all: ' + a.allTime +
       (refs ? '<br><span style="color:var(--muted);">Top sources: ' + refs + '</span>' : '');
+    // Funnel: free signups → checkouts started → paid upgrades
+    const f = a.funnel || {};
+    const cell = k => ((f[k] || {}).d7 || 0) + ' / ' + ((f[k] || {}).d30 || 0);
+    el.innerHTML += '<br><b>Funnel (7d / 30d)</b><br>Signups: ' + cell('signup') +
+      ' · Checkouts: ' + cell('checkout_started') +
+      ' · <span style="color:var(--green);">Paid: ' + cell('upgrade') + '</span>';
+    const src = (a.sources30d || []).slice(0, 5)
+      .map(x => esc(x.source.slice(0, 24) + ': ' + x.visits + ' visits → ' + x.signups + ' signups → ' + x.upgrades + ' paid')).join('<br>');
+    if (src) el.innerHTML += '<br><span style="color:var(--muted);">By campaign (30d):<br>' + src + '</span>';
   } catch(e){ el.textContent = 'Analytics unavailable right now.'; }
 }
 
 initApp();
 </script>
 <script>
+  // Campaign tags: keep the utm_* tags a visitor arrived with (for 30 days) so a
+  // signup or paid plan can be credited to the ad or post that brought them.
+  function coaiUtm() {
+    var keys = ['utm_source', 'utm_medium', 'utm_campaign'], found = {}, any = false;
+    try {
+      var q = new URLSearchParams(location.search);
+      keys.forEach(function (k) { var v = q.get(k); if (v) { found[k] = v.slice(0, 100); any = true; } });
+      if (any) { localStorage.setItem('coai_utm', JSON.stringify({ tags: found, at: Date.now() })); return found; }
+      var saved = JSON.parse(localStorage.getItem('coai_utm') || 'null');
+      if (saved && Date.now() - saved.at < 30 * 864e5) return saved.tags;
+    } catch (e) {}
+    return {};
+  }
   try {
-    navigator.sendBeacon('/api/track', new Blob([JSON.stringify({ path: 'app', ref: document.referrer || '' })], { type: 'application/json' }));
+    navigator.sendBeacon('/api/track', new Blob([JSON.stringify({ path: 'app', ref: document.referrer || '', utm: coaiUtm() })], { type: 'application/json' }));
   } catch (e) {}
 </script>
 </body>
