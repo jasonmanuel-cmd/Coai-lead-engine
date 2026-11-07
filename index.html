@@ -353,13 +353,29 @@ summary:focus-visible,
   .bulk-bar{flex-wrap:wrap;}
 }
 </style>
+<script>
+  // Owner-only controls (GOD MODE badge, owner key, site traffic) stay hidden from
+  // customers. The owner turns them on once per browser with /app?owner=1
+  // (/app?owner=0 turns them off); a saved owner key also turns them on.
+  (function () {
+    try {
+      var q = new URLSearchParams(location.search).get('owner');
+      if (q === '1') localStorage.setItem('coai_owner', '1');
+      if (q === '0') { localStorage.removeItem('coai_owner'); sessionStorage.removeItem('coai_auth'); }
+      if (localStorage.getItem('coai_owner') === '1' || sessionStorage.getItem('coai_auth')) {
+        document.documentElement.classList.add('owner-mode');
+      }
+    } catch (e) {}
+  })();
+</script>
+<style>html:not(.owner-mode) .owner-only{display:none !important;}</style>
 </head>
 <body>
 
 <header>
   <div class="logo">COAI <span>LEAD ENGINE</span><span class="ver">v2.0</span></div>
   <div class="header-right">
-    <div class="god-badge">⚡ GOD MODE</div>
+    <div class="god-badge owner-only">⚡ GOD MODE</div>
     <div class="header-status"><span class="pulse"></span>PROSPECTOR READY</div>
     <button class="settings-gear" onclick="toggleSettings()" title="Settings" aria-label="Open settings">⚙</button>
   </div>
@@ -846,7 +862,7 @@ summary:focus-visible,
           <button class="gsr-btn" style="font-size:9px;" onclick="doLogout()">Log out</button>
         </div>
       </div>
-      <div class="field" style="margin-top:10px;">
+      <div class="field owner-only" style="margin-top:10px;">
         <label>Owner key (optional)</label>
         <input type="password" id="app-password" placeholder="Admin master key…"/>
         <small style="color:var(--muted);">Optional — the owner's APP_PASSWORD overrides login (unlimited).</small>
@@ -865,7 +881,7 @@ summary:focus-visible,
         <div class="session-stat"><span style="color:var(--muted);">Contacted</span><span id="s-contacted" style="color:var(--amber);font-family:var(--mono);">0</span></div>
         <div class="session-stat"><span style="color:var(--muted);">Closed</span><span id="s-closed" style="color:var(--green);font-family:var(--mono);">0</span></div>
       </div>
-      <div style="margin-top:12px;border-top:1px dashed var(--border);padding-top:10px;">
+      <div class="owner-only" style="margin-top:12px;border-top:1px dashed var(--border);padding-top:10px;">
         <div class="sidebar-label" style="margin-bottom:6px;">Site Traffic (owner) <button type="button" class="gsr-btn" style="font-size:9px;padding:2px 8px;" onclick="loadAnalytics()">↻ refresh</button></div>
         <div id="owner-analytics" style="font-family:var(--mono);font-size:11px;line-height:1.7;color:var(--muted);">Enter the owner key, then hit refresh.</div>
       </div>
@@ -1116,9 +1132,9 @@ summary:focus-visible,
           <ul style="font-size:11px;color:var(--muted);list-style:none;margin:10px 0;display:flex;flex-direction:column;gap:5px;">
             <li>✓ 5,000 API calls / month (≈ 100+ full scans)</li>
             <li>✓ Everything in Starter</li>
-            <li>✓ Priority scan queue</li>
-            <li>✓ All radius tiers (50mi)</li>
+            <li>✓ Priority support</li>
             <li>✓ Best for agencies</li>
+            <li>✓ Cancel anytime</li>
           </ul>
           <button class="search-btn" style="width:100%;font-size:11px;border-color:var(--red);" onclick="startCheckout('pro')">🔥 GET PRO</button>
         </div>
