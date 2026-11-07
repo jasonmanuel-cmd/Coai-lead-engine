@@ -13,6 +13,7 @@ const {
   createSession, destroySession, sessionCookie, clearSessionCookie, parseCookies, resolveCaller,
 } = require('../lib/saas');
 const { query } = require('../lib/db');
+const { recordEvent } = require('../lib/events');
 
 // Lightweight in-memory rate limiter for login/signup (per serverless instance).
 // Raises the bar against credential-stuffing and mass fake-account creation.
@@ -102,6 +103,7 @@ module.exports = async function handler(req, res) {
         `INSERT INTO subscriptions (user_id, plan, status) VALUES ($1, 'free', 'free')
          ON CONFLICT (user_id) DO NOTHING`, [user.id]
       );
+      await recordEvent('signup', { userId: user.id, utm: (req.body || {}).utm });
       const token = await createSession(user.id);
       return json(res, 201, { ok: true, email: user.email }, { 'Set-Cookie': sessionCookie(token) });
     }

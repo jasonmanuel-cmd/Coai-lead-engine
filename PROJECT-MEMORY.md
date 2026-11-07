@@ -14,7 +14,7 @@ A SaaS lead-generation tool: scans any city + industry via live Google Maps data
 | Pages | `/` = marketing landing · `/app` = the tool · `/tos` `/privacy` · `/robots.txt` `/sitemap.xml` |
 
 ## Plans & quotas (lib/saas.js)
-- Free: **10 scans/mo** (reduced from 100 on 2026-10-14 to push upgrades)
+- Free: **50 API calls/mo** (100 → 10 on 2026-10-14; raised to 50 on 2026-11-07 so a free user can finish one full ~40-call scan)
 - Starter: $49/mo → 1,500 scans (env `STRIPE_PRICE_STARTER`)
 - Pro: $99/mo → 5,000 scans (env `STRIPE_PRICE_PRO`)
 - 7-day money-back guarantee on all paid plans (landing page + TOS §2)

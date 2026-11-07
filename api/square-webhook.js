@@ -9,6 +9,7 @@
 // otherwise falls back to the ?secret= shared-secret URL.
 
 const { query } = require('../lib/db');
+const { recordEvent } = require('../lib/events');
 const { verifySquareSignature, squareApi } = require('../lib/saas');
 const { safeEqual } = require('../lib/cron-auth');
 
@@ -86,6 +87,8 @@ module.exports = async function handler(req, res) {
           [user.id, customerId, sub.id, plan, status]
         );
         await query('UPDATE users SET stripe_customer_id = $1 WHERE id = $2', [customerId, user.id]);
+        // Funnel: first time this subscription is seen active counts as one 'upgrade'
+        if (status === 'active') await recordEvent('upgrade', { userId: user.id, plan, extId: `sq:${sub.id}` });
       } else {
         // Still record by subscription id in case the user row shows up later
         await query(

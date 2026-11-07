@@ -11,6 +11,7 @@
 
 const crypto = require('crypto');
 const { resolveCaller, PLANS, stripeApi, squareApi, resolvePlanProvider } = require('../lib/saas');
+const { recordEvent } = require('../lib/events');
 
 function origin(req) {
   const proto = req.headers['x-forwarded-proto'] || 'https';
@@ -60,6 +61,7 @@ module.exports = async function handler(req, res) {
           cancel_url: `${base}/app?canceled=1`,
           allow_promotion_codes: 'true',
         });
+        await recordEvent('checkout_started', { userId: caller.id, plan: planDef.key, extId: session.id });
         return res.status(200).json({ url: session.url, provider: 'stripe' });
       }
 
@@ -81,6 +83,7 @@ module.exports = async function handler(req, res) {
       });
       const url = link.payment_link && link.payment_link.url;
       if (!url) return res.status(502).json({ error: 'Square did not return a checkout URL.' });
+      await recordEvent('checkout_started', { userId: caller.id, plan: planDef.key });
       return res.status(200).json({ url, provider: 'square' });
     }
 

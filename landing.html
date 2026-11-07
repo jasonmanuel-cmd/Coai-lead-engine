@@ -22,7 +22,7 @@
 <meta name="twitter:title" content="COAI Lead Engine — Find Local Business Leads in Minutes"/>
 <meta name="twitter:description" content="Scan any city or industry for local business leads, score them, and reach out with AI-written messages. Free to start."/>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"SoftwareApplication","name":"COAI Lead Engine","applicationCategory":"BusinessApplication","operatingSystem":"Web","url":"https://coaihq.online/","description":"Find, score, and reach local business leads. Scans any city or industry, returns contact details, lead scores, AI-written outreach, CRM pipeline, and CSV export.","offers":[{"@type":"Offer","name":"Free","price":"0","priceCurrency":"USD","description":"10 API calls per month — enough for a first real scan"},{"@type":"Offer","name":"Starter","price":"49","priceCurrency":"USD","description":"1,500 API calls per month, roughly 30+ full enriched scans"},{"@type":"Offer","name":"Pro","price":"99","priceCurrency":"USD","description":"5,000 API calls per month, roughly 100+ full enriched scans"}]}
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"COAI Lead Engine","applicationCategory":"BusinessApplication","operatingSystem":"Web","url":"https://coaihq.online/","description":"Find, score, and reach local business leads. Scans any city or industry, returns contact details, lead scores, AI-written outreach, CRM pipeline, and CSV export.","offers":[{"@type":"Offer","name":"Free","price":"0","priceCurrency":"USD","description":"50 API calls per month — enough for one full scan"},{"@type":"Offer","name":"Starter","price":"49","priceCurrency":"USD","description":"1,500 API calls per month, roughly 30+ full enriched scans"},{"@type":"Offer","name":"Pro","price":"99","priceCurrency":"USD","description":"5,000 API calls per month, roughly 100+ full enriched scans"}]}
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -180,7 +180,7 @@ footer{border-top:1px solid var(--border);padding:34px 0;color:var(--muted);font
         <h3>Free</h3>
         <div class="price">$0<small>/mo</small></div>
         <ul>
-          <li>10 API calls / month — a first real scan</li>
+          <li>50 API calls / month — one full scan</li>
           <li>Lead scoring &amp; contact details</li>
           <li>CRM pipeline &amp; notes</li>
           <li>CSV export</li>
@@ -223,7 +223,7 @@ footer{border-top:1px solid var(--border);padding:34px 0;color:var(--muted);font
     <h2>Questions, answered</h2>
     <div class="faq">
       <details><summary>Do I need my own Google Maps API key?</summary><p>No. COAI Lead Engine handles all Google Maps data on our servers — you never touch an API key or a Google Cloud bill. Your scans just work.</p></details>
-      <details><summary>What counts toward my quota?</summary><p>Quotas are counted in API calls: each city search, results page, and contact-details lookup counts as one. A typical full scan (one category, ~40 businesses with phone + website enrichment) uses roughly 40 calls — so Starter's 1,500 calls cover about 30+ full scans a month, and Pro's 5,000 cover 100+. The free plan's 10 calls are enough to run a first real scan and see genuine results. Your live usage is always shown inside the app.</p></details>
+      <details><summary>What counts toward my quota?</summary><p>Quotas are counted in API calls: each city search, results page, and contact-details lookup counts as one. A typical full scan (one category, ~40 businesses with phone + website enrichment) uses roughly 40 calls — so Starter's 1,500 calls cover about 30+ full scans a month, and Pro's 5,000 cover 100+. The free plan's 50 calls cover one full scan, so you see real results before you pay. Your live usage is always shown inside the app.</p></details>
       <details><summary>Is the data fresh?</summary><p>Yes — every scan runs against live Google Maps data at the moment you search, not a stale exported database that's months old.</p></details>
       <details><summary>Can I cancel anytime?</summary><p>Yes. Manage or cancel your subscription yourself in one click from inside the app — no emails, no phone calls, no hoops.</p></details>
       <details><summary>Can I export my leads?</summary><p>Always. Every plan (including Free) exports leads to CSV, so your data is yours.</p></details>
@@ -235,7 +235,7 @@ footer{border-top:1px solid var(--border);padding:34px 0;color:var(--muted);font
 
 <section class="cta-band">
   <div class="container">
-    <h2>Your next 50 leads are one scan away.</h2>
+    <h2>Your next 40 leads are one scan away.</h2>
     <p class="section-sub" style="margin:0 auto 28px;">Create a free account and run your first scan in the next 5 minutes.</p>
     <a class="btn" href="/app">Start scanning free →</a>
   </div>
@@ -248,8 +248,21 @@ footer{border-top:1px solid var(--border);padding:34px 0;color:var(--muted);font
   </div>
 </footer>
 <script>
+  // Campaign tags: keep the utm_* tags a visitor arrived with (for 30 days) so a
+  // signup or paid plan can be credited to the ad or post that brought them.
+  function coaiUtm() {
+    var keys = ['utm_source', 'utm_medium', 'utm_campaign'], found = {}, any = false;
+    try {
+      var q = new URLSearchParams(location.search);
+      keys.forEach(function (k) { var v = q.get(k); if (v) { found[k] = v.slice(0, 100); any = true; } });
+      if (any) { localStorage.setItem('coai_utm', JSON.stringify({ tags: found, at: Date.now() })); return found; }
+      var saved = JSON.parse(localStorage.getItem('coai_utm') || 'null');
+      if (saved && Date.now() - saved.at < 30 * 864e5) return saved.tags;
+    } catch (e) {}
+    return {};
+  }
   try {
-    navigator.sendBeacon('/api/track', new Blob([JSON.stringify({ path: 'landing', ref: document.referrer || '' })], { type: 'application/json' }));
+    navigator.sendBeacon('/api/track', new Blob([JSON.stringify({ path: 'landing', ref: document.referrer || '', utm: coaiUtm() })], { type: 'application/json' }));
   } catch (e) {}
 </script>
 </body>
