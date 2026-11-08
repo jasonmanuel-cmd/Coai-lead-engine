@@ -9,6 +9,8 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   const caller = await resolveCaller(req);
   if (!caller) return res.status(401).json({ error: 'Unauthorized.' });
+  // Owner-only tool: the customer app never calls it, and it scrapes search engines.
+  if (!caller.admin) return res.status(403).json({ error: 'Owner key required.' });
   const { name = '', phone = '', address = '', city = '' } = req.query;
   if (!name.trim()) return res.status(400).json({ error: 'name is required.' });
   const excluded = ['google.com','bing.com','duckduckgo.com','yahoo.com','yelp.com','facebook.com','instagram.com','linkedin.com','yellowpages.com','mapquest.com','bbb.org','manta.com','nextdoor.com','angi.com','thumbtack.com','homeadvisor.com','chamberofcommerce.com','porch.com','buildzoom.com'];
