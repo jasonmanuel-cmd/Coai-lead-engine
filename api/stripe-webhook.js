@@ -76,18 +76,24 @@ module.exports = async function handler(req, res) {
         // subscription's price ID and map it — this is what makes Pro work.
         let plan = (data.metadata && data.metadata.plan) || null;
         let periodEnd = null;
+        let subStatus = 'active';
         if (data.subscription && process.env.STRIPE_SECRET_KEY) {
-          try {
-            const subResp = await fetch(
-              `https://api.stripe.com/v1/subscriptions/${data.subscription}`,
-              { headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` } }
-            );
-            const sub = await subResp.json();
-            if (!sub.error) {
-              plan = planFromSubscription(sub) || plan;
-              periodEnd = periodEndFromSubscription(sub);
-            }
-          } catch (e) { console.warn('stripe-webhook: subscription lookup failed:', e.message); }
+          // If Stripe can't be asked, fail with 500 so Stripe retries later,
+          // rather than guessing the plan (a Pro buyer would get Starter).
+          const subResp = await fetch(
+            `https://api.stripe.com/v1/subscriptions/${data.subscription}`,
+            { headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` } }
+          );
+          const sub = await subResp.json();
+          if (sub.error) throw new Error('subscription lookup failed: ' + (sub.error.message || 'unknown'));
+          plan = planFromSubscription(sub) || plan;
+          periodEnd = periodEndFromSubscription(sub);
+          // A late retry of this event must not reactivate a cancelled plan.
+          if (sub.status) subStatus = sub.status;
+        }
+        if (plan !== 'pro' && plan !== 'starter') {
+          console.error('stripe-webhook: could not map plan for session', data.id,
+            '- check STRIPE_PRICE_PRO / STRIPE_PRICE_STARTER. Defaulting to starter.');
         }
         plan = plan === 'pro' ? 'pro' : 'starter';
         // Fall back to a month out only if Stripe could not be asked; the
@@ -99,11 +105,13 @@ module.exports = async function handler(req, res) {
            ON CONFLICT (user_id) DO UPDATE SET
              stripe_customer_id = $2, stripe_subscription_id = $3,
              plan = $4, status = $5, current_period_end = $6, updated_at = NOW()`,
-          [userId, data.customer, data.subscription, plan, 'active', periodEnd || fallbackEnd]
+          [userId, data.customer, data.subscription, plan, subStatus, periodEnd || fallbackEnd]
         );
         await query('UPDATE users SET stripe_customer_id = $1 WHERE id = $2', [data.customer, userId]);
         // Funnel: one 'upgrade' per paid checkout (session id dedupes webhook retries)
-        await recordEvent('upgrade', { userId, plan, extId: data.id });
+        if (subStatus === 'active' || subStatus === 'trialing') {
+          await recordEvent('upgrade', { userId, plan, extId: data.id });
+        }
       }
     }
 
@@ -112,7 +120,8 @@ module.exports = async function handler(req, res) {
       // Price ID wins (always present); metadata is only a fallback.
       const plan = planFromSubscription(data) || (data.metadata && data.metadata.plan) || null;
       const periodEnd = periodEndFromSubscription(data);
-      await query(
+      const metaUserId = parseInt(data.metadata && data.metadata.user_id, 10) || 0;
+      const upd = await query(
         `UPDATE subscriptions SET status = $1,
              plan = COALESCE($2, plan),
              current_period_end = COALESCE($3, current_period_end),
@@ -120,9 +129,18 @@ module.exports = async function handler(req, res) {
              updated_at = NOW()
          WHERE stripe_subscription_id = $5
             OR (stripe_subscription_id IS NULL AND user_id = $6)`,
-        [status, plan, periodEnd, data.customer, data.id,
-         parseInt(data.metadata && data.metadata.user_id, 10) || 0]
+        [status, plan, periodEnd, data.customer, data.id, metaUserId]
       );
+      // No row yet (this event arrived before checkout.session.completed):
+      // create it when we know the user and the plan.
+      if (upd.rowCount === 0 && metaUserId && plan && type !== 'customer.subscription.deleted') {
+        await query(
+          `INSERT INTO subscriptions (user_id, stripe_customer_id, stripe_subscription_id, plan, status, current_period_end)
+           VALUES ($1, $2, $3, $4, $5, $6)
+           ON CONFLICT (user_id) DO NOTHING`,
+          [metaUserId, data.customer, data.id, plan, status, periodEnd]
+        );
+      }
     }
 
     if (type === 'invoice.payment_failed' && data) {

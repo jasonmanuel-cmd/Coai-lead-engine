@@ -62,6 +62,10 @@ module.exports = async function handler(req, res) {
       const status = mapStatus(sub.status);
       const plan = planFromVariation(sub.plan_variation_id) || 'starter';
       const customerId = sub.customer_id;
+      // Square reports the date the customer has paid through (YYYY-MM-DD);
+      // use it so access ends when the paid time does.
+      const paidThrough = /^\d{4}-\d{2}-\d{2}$/.test(String(sub.charged_through_date || ''))
+        ? sub.charged_through_date : null;
 
       // Resolve the local user by Square customer email (accounts are email-keyed)
       let user = null;
@@ -80,11 +84,15 @@ module.exports = async function handler(req, res) {
       if (user) {
         await query(
           `INSERT INTO subscriptions (user_id, stripe_customer_id, stripe_subscription_id, plan, status, current_period_end)
-           VALUES ($1, $2, $3, $4, $5, NOW() + interval '1 month')
+           VALUES ($1, $2, $3, $4, $5, CASE WHEN $5::text = 'active' THEN COALESCE($6::timestamp, NOW() + interval '1 month') ELSE NULL END)
            ON CONFLICT (user_id) DO UPDATE SET
              stripe_customer_id = $2, stripe_subscription_id = $3,
-             plan = $4, status = $5, current_period_end = NOW() + interval '1 month', updated_at = NOW()`,
-          [user.id, customerId, sub.id, plan, status]
+             plan = $4, status = $5,
+             -- only an active event extends paid time; a cancel keeps the time already paid
+             current_period_end = CASE WHEN $5::text = 'active' THEN COALESCE($6::timestamp, NOW() + interval '1 month')
+                                       ELSE subscriptions.current_period_end END,
+             updated_at = NOW()`,
+          [user.id, customerId, sub.id, plan, status, paidThrough]
         );
         await query('UPDATE users SET stripe_customer_id = $1 WHERE id = $2', [customerId, user.id]);
         // Funnel: first time this subscription is seen active counts as one 'upgrade'
@@ -94,9 +102,11 @@ module.exports = async function handler(req, res) {
         await query(
           `UPDATE subscriptions SET status = $1, plan = $2,
              stripe_customer_id = COALESCE($3, stripe_customer_id),
-             current_period_end = NOW() + interval '1 month', updated_at = NOW()
+             current_period_end = CASE WHEN $1::text = 'active' THEN COALESCE($5::timestamp, NOW() + interval '1 month')
+                                       ELSE current_period_end END,
+             updated_at = NOW()
            WHERE stripe_subscription_id = $4`,
-          [status, plan, customerId, sub.id]
+          [status, plan, customerId, sub.id, paidThrough]
         );
       }
     }
