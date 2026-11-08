@@ -16,12 +16,12 @@ A SaaS lead-generation tool: scans any city + industry via live Google Maps data
 ## Plans & quotas (lib/saas.js)
 - Free: **50 API calls/mo** (100 → 10 on 2026-10-14; raised to 50 on 2026-11-07 so a free user can finish one full ~40-call scan)
 - Starter: $49/mo → 1,500 scans (env `STRIPE_PRICE_STARTER`)
-- Pro: $99/mo → 5,000 scans (env `STRIPE_PRICE_PRO`)
+- Pro: $199/mo (raised from $99 on 2026-11-08; new Stripe price needed) → 5,000 scans (env `STRIPE_PRICE_PRO`)
 - 7-day money-back guarantee on all paid plans (landing page + TOS §2)
 
 ## Stripe (live account acct_1ScKln0u37S56JoG — "Chaotically Organized AI")
 - Products: Starter `prod_VRMMwVPzsShgeX`, Pro `prod_VRMM8OUoZKRcXv`
-- Prices: Starter `price_1UQTeN0u37S56JoGNneLXFfb` ($49/mo), Pro `price_1UQTeN0u37S56JoGmXYJ5Cqh` ($99/mo)
+- Prices: Starter `price_1UQTeN0u37S56JoGNneLXFfb` ($49/mo), Pro `price_1UQTeN0u37S56JoGmXYJ5Cqh` ($99/mo, old; replace with the new $199 price id)
 - Shareable payment links: Starter https://buy.stripe.com/fZu9ALfHH86z1Cy7kP5c401 · Pro https://buy.stripe.com/eVqaEPdzzcmPa9420v5c402
 - Webhook event destination `we_1UQXE30u37S56JoGPSWwQXXZ` (Workbench-style): URL = `https://coaihq.online/api/stripe-webhook?secret=<STRIPE_WEBHOOK_URL_SECRET>`, events: checkout.session.completed, customer.subscription.updated, customer.subscription.deleted, invoice.payment_failed — status enabled, livemode ✅
 - Customer portal: ACTIVE. Portal login link: https://billing.stripe.com/p/login/5kQ3cn3YZ4Una948oT5c400

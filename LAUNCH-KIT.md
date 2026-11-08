@@ -1,7 +1,7 @@
 # 🚀 COAI Lead Engine — Launch Kit
 
 Everything copy-paste ready. Product: https://coaihq.online · App: https://coaihq.online/app
-Starter $49/mo (1,500 calls ≈ 30+ full scans) · Pro $99/mo (5,000 calls ≈ 100+ full scans) · Free trial, no card · 7-day money-back guarantee.
+Starter $49/mo (1,500 calls ≈ 30+ full scans) · Pro $199/mo (5,000 calls ≈ 100+ full scans) · Free trial, no card · 7-day money-back guarantee.
 
 **Payment links (sell anywhere, even in DMs):**
 - Starter: https://buy.stripe.com/fZu9ALfHH86z1Cy7kP5c401
@@ -152,7 +152,7 @@ Built by @[your-handle] — feedback welcome 🙏
 >
 > **Stack:** Vercel + Postgres + Google Places + Gemini, Stripe billing. Solo-built.
 >
-> **Pricing:** Free trial (no card) → $49 → $99. 7-day money-back guarantee.
+> **Pricing:** Free trial (no card) → $49 → $199. 7-day money-back guarantee.
 >
 > **Ask:** Trying to get my first 10 paying users. If you sell to local businesses, I'd love you to run one free scan and tell me what's missing: https://coaihq.online
 
