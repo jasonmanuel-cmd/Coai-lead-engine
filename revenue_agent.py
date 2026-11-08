@@ -70,7 +70,7 @@ API_PATH = "/c/Users/blunt/Desktop/model-training/src"
 sys.path.insert(0, API_PATH)
 
 API_BASE = os.getenv("API_BASE", "http://127.0.0.1:8080")
-COAI_PASSWORD = os.getenv("COAI_PASSWORD", "COAIGODMODE2026")
+COAI_PASSWORD = os.getenv("COAI_PASSWORD", "")
 SUPERMEMORY_KEY = os.getenv("SUPERMEMORY_CODEX_API_KEY", "")
 LEAD_TRACKING_DIR = os.getenv("LEAD_TRACKING_DIR", "/c/Users/blunt/lead-tracking")
 EMAIL_TO = os.getenv("EMAIL_TO", "blunts954@gmail.com")

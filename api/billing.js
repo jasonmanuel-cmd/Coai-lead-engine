@@ -11,6 +11,7 @@
 
 const crypto = require('crypto');
 const { resolveCaller, PLANS, stripeApi, squareApi, resolvePlanProvider } = require('../lib/saas');
+const { recordEvent } = require('../lib/events');
 
 function origin(req) {
   const proto = req.headers['x-forwarded-proto'] || 'https';
@@ -20,7 +21,7 @@ function origin(req) {
 
 module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', process.env.SITE_URL || 'https://coaihq.online');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -60,6 +61,7 @@ module.exports = async function handler(req, res) {
           cancel_url: `${base}/app?canceled=1`,
           allow_promotion_codes: 'true',
         });
+        await recordEvent('checkout_started', { userId: caller.id, plan: planDef.key, extId: session.id });
         return res.status(200).json({ url: session.url, provider: 'stripe' });
       }
 
@@ -81,6 +83,7 @@ module.exports = async function handler(req, res) {
       });
       const url = link.payment_link && link.payment_link.url;
       if (!url) return res.status(502).json({ error: 'Square did not return a checkout URL.' });
+      await recordEvent('checkout_started', { userId: caller.id, plan: planDef.key });
       return res.status(200).json({ url, provider: 'square' });
     }
 
@@ -107,7 +110,9 @@ module.exports = async function handler(req, res) {
       }
       await squareApi('POST', `subscriptions/${encodeURIComponent(caller.subscriptionId)}/cancel`);
       await require('../lib/db').query(
-        "UPDATE subscriptions SET status = 'canceled', updated_at = NOW() WHERE user_id = $1",
+        // Keep paid time: access ends at current_period_end, and Square's own
+        // CANCELED webhook marks it 'canceled' when the subscription really ends.
+        "UPDATE subscriptions SET status = 'canceling', updated_at = NOW() WHERE user_id = $1",
         [caller.id]
       );
       return res.status(200).json({ ok: true, message: 'Subscription canceled. Your plan stays active until the end of the paid period.' });

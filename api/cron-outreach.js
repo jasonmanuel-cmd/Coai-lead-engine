@@ -1,63 +1,51 @@
 // api/cron-outreach.js — hourly email outreach orchestrator
 const { query, initSchema } = require('../lib/db');
-const nodemailer = require('nodemailer');
+const { sendEmail, emailConfigured } = require('../lib/email');
+const { isCronAuthorized } = require('../lib/cron-auth');
+
+// CAN-SPAM: identify the sender, give a working opt-out, include a postal address.
+function footer() {
+  const addr = process.env.OUTREACH_POSTAL_ADDRESS || '';
+  const from = process.env.EMAIL_FROM || process.env.EMAIL_USER || '';
+  return `\n\n--\nChaotically Organized AI, LLC${addr ? `\n${addr}` : ''}\nNot interested? Reply "unsubscribe" to ${from} and we will not contact you again.`;
+}
 
 const templates = {
   initial: (name, city) =>
     `Hi ${name},\n\nWe specialize in helping local businesses like yours improve their online presence and attract more customers. We've been working with shops in ${city} and would love to discuss how we can help.\n\nWould you be open to a quick 15-minute call?\n\nBest regards`,
-  followup: (name) =>
-    `Hi ${name},\n\nJust following up on our previous message. We have a proven system that's helped similar businesses increase their visibility.\n\nLet me know if you'd like to chat.\n\nBest regards`
 };
 
 module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
   if (req.method === 'OPTIONS') return res.status(200).end();
-
-  const authToken = req.headers.authorization;
-  if (authToken !== process.env.CRON_SECRET) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
+  if (!isCronAuthorized(req)) return res.status(401).json({ error: 'Unauthorized' });
+  if (!emailConfigured()) return res.status(500).json({ error: 'EMAIL_USER/EMAIL_PASS not configured.' });
 
   try {
     await initSchema();
-    const leadResult = await query(
-      `SELECT id, name, email, city, last_messaged
-       FROM leads
+    // Never re-contact anyone who has asked out (outreach_log.status = 'unsubscribed').
+    const leads = (await query(
+      `SELECT id, name, email, city FROM leads l
        WHERE pipeline_stage = 'qualified' AND email IS NOT NULL AND last_messaged IS NULL
+         AND NOT EXISTS (SELECT 1 FROM outreach_log o WHERE lower(o.email) = lower(l.email) AND o.status = 'unsubscribed')
        ORDER BY score DESC LIMIT 10`
-    );
+    )).rows;
 
     let sent = 0;
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
-    });
-
-    for (const lead of leadResult.rows) {
+    for (const lead of leads) {
       try {
-        const body = templates.initial(lead.name, lead.city || 'your area');
-
-        await transporter.sendMail({
-          from: process.env.EMAIL_USER,
+        await sendEmail({
           to: lead.email,
           subject: `Quick question for ${lead.name}`,
-          text: body
+          text: templates.initial(lead.name, lead.city || 'your area') + footer(),
         });
-
         await query(
-          `INSERT INTO outreach_log (lead_id, email, template_name, status)
-           VALUES ($1, $2, $3, $4)`,
+          'INSERT INTO outreach_log (lead_id, email, template_name, status) VALUES ($1, $2, $3, $4)',
           [lead.id, lead.email, 'initial', 'sent']
         );
-
         await query(
-          `UPDATE leads SET last_messaged = NOW(), pipeline_stage = 'messaged', updated_at = NOW() WHERE id = $1`,
+          "UPDATE leads SET last_messaged = NOW(), pipeline_stage = 'messaged', updated_at = NOW() WHERE id = $1",
           [lead.id]
         );
-
         sent++;
       } catch (err) {
         console.error(`Outreach failed for lead ${lead.id}:`, err.message);
@@ -66,6 +54,7 @@ module.exports = async (req, res) => {
 
     res.status(200).json({ status: 'OK', sent });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('cron-outreach error:', error);
+    res.status(500).json({ error: 'Outreach failed.' });
   }
 };

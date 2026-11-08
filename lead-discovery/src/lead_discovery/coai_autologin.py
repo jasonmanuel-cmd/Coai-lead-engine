@@ -1,6 +1,6 @@
 """COAIHQ auto-login skill for the prime-agent.
 
-Automatically authenticates to coaihq.online using the COAIGODMODE2026 password,
+Automatically authenticates to coaihq.online using the COAI_PASSWORD env var,
 sets session storage, selects all industries, and triggers the "SCAN FOR LEADS"
 button. Uses browser automation (via browser_navigate/browser_console or Cloudflare Computer).
 
@@ -12,7 +12,7 @@ import json
 import os
 import re
 
-COAI_PASSWORD = os.getenv("COAI_PASSWORD", "COAIGODMODE2026")
+COAI_PASSWORD = os.getenv("COAI_PASSWORD", "")
 COAI_BASE_URL = os.getenv("COAI_BASE_URL", "https://coaihq.online")
 
 # Industry categories available in coaihq.online Lead Engine v2
@@ -254,7 +254,7 @@ def run_coai_scan(industries: list[str] | None = None) -> dict:
     logs = []
 
     logs.append(f"Navigating to {COAI_BASE_URL}")
-    logs.append(f"Login: setting sessionStorage.coai_auth = {COAI_PASSWORD}")
+    logs.append("Login: setting sessionStorage.coai_auth from COAI_PASSWORD")
     logs.append(f"Industries: {'all' if not industries else ', '.join(industries)}")
     logs.append("Clicking SCAN FOR LEADS...")
     logs.append("Waiting for scan to complete (30-60s)...")
