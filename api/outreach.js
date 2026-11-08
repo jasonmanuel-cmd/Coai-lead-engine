@@ -146,7 +146,7 @@ function chooseProvider(clientPreferred) {
   return configured[0];
 }
 
-const { resolveCaller } = require('../lib/saas');
+const { requireMeteredCaller, recordUsage } = require('../lib/saas');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', process.env.SITE_URL || 'https://coaihq.online');
@@ -154,8 +154,15 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const caller = await resolveCaller(req);
-  if (!caller) return res.status(401).json({ error: 'Unauthorized' });
+  let caller;
+  try {
+    caller = await requireMeteredCaller(req);
+  } catch (authErr) {
+    return res.status(authErr.statusCode || 401).json({
+      error: authErr.message,
+      upgrade: Boolean(authErr.upgrade),
+    });
+  }
 
   let body = {};
   try {
@@ -164,7 +171,8 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid JSON body.' });
   }
 
-  const provider = chooseProvider(body.provider);
+  // Customers can't pick the (most expensive) AI provider; only the owner can.
+  const provider = chooseProvider(caller.admin ? body.provider : undefined);
   if (!provider) {
     return res.status(200).json({ fallback: true, reason: 'No AI provider configured — using static template.', provider: null });
   }
@@ -173,6 +181,9 @@ module.exports = async function handler(req, res) {
   if (!lead || !type) return res.status(400).json({ error: 'lead and type are required.' });
 
   const prompt = buildPrompt(lead, type, sender && typeof sender === 'object' ? sender : {});
+
+  // Each AI message counts as 1 call against the monthly quota.
+  await recordUsage(caller.id, 1, 'ai_outreach');
 
   try {
     let message;

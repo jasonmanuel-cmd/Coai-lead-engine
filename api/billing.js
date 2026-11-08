@@ -110,7 +110,9 @@ module.exports = async function handler(req, res) {
       }
       await squareApi('POST', `subscriptions/${encodeURIComponent(caller.subscriptionId)}/cancel`);
       await require('../lib/db').query(
-        "UPDATE subscriptions SET status = 'canceled', updated_at = NOW() WHERE user_id = $1",
+        // Keep paid time: access ends at current_period_end, and Square's own
+        // CANCELED webhook marks it 'canceled' when the subscription really ends.
+        "UPDATE subscriptions SET status = 'canceling', updated_at = NOW() WHERE user_id = $1",
         [caller.id]
       );
       return res.status(200).json({ ok: true, message: 'Subscription canceled. Your plan stays active until the end of the paid period.' });

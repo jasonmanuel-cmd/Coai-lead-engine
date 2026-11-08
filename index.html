@@ -807,8 +807,8 @@ summary:focus-visible,
         <label for="dedupe-name-address">Dedupe by normalized name + address</label>
       </div>
       <div class="check-row">
-        <input type="checkbox" id="enrich-after-scan" checked/>
-        <label for="enrich-after-scan">Auto-enrich websites after scan</label>
+        <input type="checkbox" id="enrich-after-scan"/>
+        <label for="enrich-after-scan">Auto-find emails after scan (1 call per website)</label>
       </div>
       <div style="display:flex;gap:4px;margin-bottom:10px;">
         <button class="gsr-btn" style="font-size:9px;flex:1;" onclick="applyScorePreset('default')">Default</button>
@@ -893,6 +893,7 @@ summary:focus-visible,
         <button class="gsr-btn" style="font-size:9px;" onclick="exportCRMBackup()">↓ Backup JSON</button>
         <button class="gsr-btn" style="font-size:9px;" onclick="importCRMBackup()">↑ Restore JSON</button>
       </div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:6px;line-height:1.5;">Your leads are saved in this browser only. Back up before clearing browser data or switching devices.</div>
       <input type="file" id="crm-import-file" accept=".json" style="display:none" onchange="handleCRMImportFile(this)"/>
     </div>
 
@@ -974,6 +975,8 @@ summary:focus-visible,
       <div style="display:flex;gap:8px;">
         <button class="export-btn primary" onclick="exportCSV()">↓ Export CSV</button>
         <button class="export-btn" onclick="exportHotCSV()">↓ Hot Only CSV</button>
+        <button class="export-btn" onclick="enrichAllLeads()" title="Looks up each lead's website for an email and phone. Uses 1 call per website.">✉ Find Emails</button>
+        <button class="export-btn" onclick="exportCRMBackup()" title="Your leads are saved in this browser only. Download a backup you can restore later.">↓ Backup</button>
         <button class="export-btn" onclick="openWebhookModal()" style="border-color:var(--purple);color:var(--purple);">Webhook / Zapier</button>
         <button class="export-btn" onclick="clearAll()">✕ Clear All</button>
       </div>
@@ -2874,6 +2877,12 @@ async function generateAIOutreach(){
       signal: AbortSignal.timeout(20000)
     });
     if(resp.status === 401){ openAuthModal('login'); btn.textContent = '⚡ AI Personalize'; btn.disabled = false; return; }
+    if(resp.status === 402){
+      // Out of monthly calls: show the plans instead of failing silently
+      btn.textContent = '⚡ AI Personalize'; btn.disabled = false;
+      refreshAccount(); openPricingModal();
+      return;
+    }
     const data = await resp.json();
     if(data.fallback){
       // No AI key configured or call failed — use static template silently
@@ -3069,7 +3078,7 @@ async function enrichAllLeads(){
   // Logged-in customers authenticate via session cookie (same-origin fetch
   // sends it automatically); the owner key header is only a fallback.
   const authKey = sessionStorage.getItem('coai_auth') || '';
-  if(!authKey && !accountState) return;
+  if(!authKey && !accountState){ openAuthModal('login'); return; }
 
   const leadsWithSites = allLeads.filter(l => l.hasWebsite && !l.enriched);
   if(leadsWithSites.length === 0) return;
@@ -3079,8 +3088,9 @@ async function enrichAllLeads(){
     `${allLeads.length} leads · enriching contact data... (0/${leadsWithSites.length})`;
 
   let done = 0;
+  let stopReason = null; // 'quota' or 'auth' stops the run
   // Run in batches of 5 concurrent to stay fast but not hammer servers
-  for(let i = 0; i < leadsWithSites.length; i += 5){
+  for(let i = 0; i < leadsWithSites.length && !stopReason; i += 5){
     const batch = leadsWithSites.slice(i, i + 5);
     await Promise.all(batch.map(async lead => {
       try{
@@ -3088,6 +3098,8 @@ async function enrichAllLeads(){
           '/api/scrape?url=' + encodeURIComponent(lead.website),
           { headers: { 'Authorization': authKey }, signal: AbortSignal.timeout(15000) }
         );
+        if(resp.status === 402){ stopReason = 'quota'; return; }
+        if(resp.status === 401){ stopReason = 'auth'; return; }
         if(resp.ok){
           const data = await resp.json();
           lead.enrichedPhone = data.phone || null;
@@ -3108,6 +3120,9 @@ async function enrichAllLeads(){
   updateExportInfo();
   saveCRMToStorage();
   refreshCRMIfActive();
+  if(accountState) refreshAccount(); // usage changed
+  if(stopReason === 'quota') openPricingModal();
+  if(stopReason === 'auth') openAuthModal('login');
 }
 
 function updateLeadCard(lead){
@@ -3165,12 +3180,12 @@ function exportCSV(){
   if(allLeads.length === 0){alert('No leads to export.');return;}
   const headers = ['Name','Category','Address','Phone (Google)','Phone (Enriched)','Email','Has Website','Website','Rating','Reviews','Score','Priority','Status','Note','Scan Date'];
   const rows = allLeads.map(l=>[
-    `"${l.name.replace(/"/g,'""')}"`, `"${l.cat}"`, `"${l.address}"`,
+    l.name, l.cat, l.address,
     l.phone||'', l.enrichedPhone||'', l.enrichedEmail||'',
     l.hasWebsite?'Yes':'No', l.website||'',
     l.rating||'', l.reviews||'', l.score, l.priority,
     closed.has(l.id)?'Closed':contacted.has(l.id)?'Contacted':'New',
-    `"${(l.note||'').replace(/"/g,'""')}"`,
+    l.note||'',
     l.scanDate ? l.scanDate.slice(0,10) : ''
   ]);
   downloadCSV([headers,...rows], `coai-leads-${new Date().toISOString().slice(0,10)}.csv`);
@@ -3182,15 +3197,23 @@ function exportHotCSV(){
   if(hot.length === 0){alert('No hot leads to export.');return;}
   const headers = ['Name','Category','Address','Phone (Google)','Phone (Enriched)','Email','Has Website','Rating','Reviews','Score'];
   const rows = hot.map(l=>[
-    `"${l.name.replace(/"/g,'""')}"`, `"${l.cat}"`, `"${l.address}"`,
+    l.name, l.cat, l.address,
     l.phone||'', l.enrichedPhone||'', l.enrichedEmail||'',
     l.hasWebsite?'Yes':'No', l.rating||'', l.reviews||'', l.score
   ]);
   downloadCSV([headers,...rows], `coai-HOT-leads-${new Date().toISOString().slice(0,10)}.csv`);
 }
 
+// Quote every cell and neutralise spreadsheet formulas (= - @ tab CR, or a
+// leading + that isn't a phone number like "+1 (661) 555-0100").
+function csvCell(v){
+  let s = v == null ? '' : String(v);
+  if(/^[=\-@\t\r]/.test(s) || (/^\+/.test(s) && !/^\+[\d\s().-]+$/.test(s))) s = "'" + s;
+  return '"' + s.replace(/"/g, '""') + '"';
+}
+
 function downloadCSV(data, filename){
-  const csv = data.map(r=>r.join(',')).join('\n');
+  const csv = data.map(r=>r.map(csvCell).join(',')).join('\n');
   const blob = new Blob([csv], {type:'text/csv'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
