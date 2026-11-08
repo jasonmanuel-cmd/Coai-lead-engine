@@ -13,6 +13,25 @@ const crypto = require('crypto');
 const { resolveCaller, PLANS, stripeApi, squareApi, resolvePlanProvider } = require('../lib/saas');
 const { recordEvent } = require('../lib/events');
 
+// The price shown on the site comes from PLANS; the amount actually charged comes from
+// the Stripe price ID in the env var. If the two disagree (e.g. the site says $199 but
+// STRIPE_PRICE_PRO still points at the old $99 price), refuse the checkout rather than
+// charge a different amount than the buyer saw. A failed lookup does not block checkout.
+async function stripePriceMismatch(priceId, planDef) {
+  try {
+    const resp = await fetch(`https://api.stripe.com/v1/prices/${encodeURIComponent(priceId)}`, {
+      headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` },
+    });
+    const price = await resp.json();
+    if (price && typeof price.unit_amount === 'number' && price.unit_amount !== Math.round(planDef.price * 100)) {
+      return `$${(price.unit_amount / 100).toFixed(2)}`;
+    }
+  } catch (e) {
+    console.warn('billing: could not verify Stripe price -', e.message);
+  }
+  return null;
+}
+
 function origin(req) {
   const proto = req.headers['x-forwarded-proto'] || 'https';
   const host = req.headers['x-forwarded-host'] || req.headers.host || 'coaihq.online';
@@ -48,6 +67,13 @@ module.exports = async function handler(req, res) {
 
       // ── Stripe path ──
       if (providerInfo.provider === 'stripe') {
+        const charged = await stripePriceMismatch(providerInfo.ref, planDef);
+        if (charged) {
+          console.error(`billing: ${planDef.key} shows $${planDef.price} but Stripe price ${providerInfo.ref} charges ${charged}`);
+          return res.status(500).json({
+            error: `Checkout for ${planDef.name} is paused: the site price ($${planDef.price}/mo) doesn't match the Stripe price (${charged}). Please contact support.`,
+          });
+        }
         const session = await stripeApi('checkout/sessions', {
           mode: 'subscription',
           'line_items[0][price]': providerInfo.ref,
