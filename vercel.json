@@ -49,12 +49,6 @@
     { "src": "/og-image.png", "dest": "/og-image.png" },
     { "src": "/(.*)",         "dest": "/index.html"      }
   ],
-  "crons": [
-    { "path": "/api/cron-discover", "schedule": "0 * * * *" },
-    { "path": "/api/cron-audit", "schedule": "5 * * * *" },
-    { "path": "/api/cron-qualify", "schedule": "10 * * * *" },
-    { "path": "/api/cron-outreach", "schedule": "15 * * * *" }
-  ],
   "headers": [
     {
       "source": "/(.*)",
