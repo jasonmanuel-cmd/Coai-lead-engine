@@ -1,0 +1,89 @@
+# Prime Agent Configuration for Lead Discovery (coaiagent1)
+# Full access: coaihq.online, GitHub, Cloudflare, Vercel, Supabase
+# Updated: 2026-08-07
+
+# ===== API Settings =====
+api:
+  lead_scoring_url: "http://127.0.0.1:8080"
+
+# ===== GitHub Access =====
+github:
+  token: ""  # Uses gh CLI token (gho_*** with repo, read:org, gist, workflow scopes)
+  username: "jasonmanuel-cmd"
+  repos_to_watch:
+    - "Coai-lead-engine"
+    - "coainewweb"
+    - "coai-template"
+    - "MASTER-COAI"
+    - "prime-agent"
+    - "WinCarePro"
+    - "signalcart"
+    - "ruview"
+    - "kinproof"
+    - "kasiStock"
+    - "FeeScout"
+    - "LeadShield"
+
+# ===== coaihq.online Access =====
+coaihq:
+  password: ""  # Set the COAI_PASSWORD env var; never commit it here
+  base_url: "https://coaihq.online"
+  # Auth: password set via prompt, sessionStorage.coai_auth = password
+  # Provides: Lead Engine v2 (COAI Lead Engine v2 — God Mode Prospector)
+
+# ===== Cloudflare Access =====
+cloudflare:
+  account_id: "90d28874d16643188318117e18074e3a"
+  api_token: ""  # Set the CLOUDFLARE_API_TOKEN env var
+  # When set, the agent will use Cloudflare Computer (Durable Objects)
+  # to run browser automation for scraping Google Maps/DuckDuckGo
+  # in isolated containers with real network access.
+
+# ===== Vercel Access =====
+vercel:
+  token: ""  # Uses vercel CLI auth (logged in as chaoticallyorganizedai-2944)
+  projects:
+    - "prime-agent-ui"
+    - "coaileads"
+    - "coaibakersfield"
+    - "leadshield-crm"
+
+# ===== Supabase Access =====
+supabase:
+  url: "https://api.supabase.com"
+  key: ""  # Service role key for Cipher sovereign project
+  project_ref: ""
+
+# ===== Supermemory Access =====
+supermemory:
+  org_id: "9BDei71qniQUDpPd6kks2g"
+  api_key: ""  # Set SUPERMEMORY_CODEX_API_KEY env var (uses existing env key)
+  doc_count: 70  # PDF documents in memory bank
+  search_query_hint: "Use supermemory_search(query, limit=10) to search 70 PDF docs + long-term memory"
+
+# ===== Discovery Settings =====
+discovery:
+  default_location: "Bakersfield"
+  default_industries: ["plumber", "electrician", "roofer", "hvac", "contractor"]
+  max_businesses: 50
+
+# ===== Known Business Domains (reference sites) =====
+known_domains:
+  - "coaihq.online"        # COAI Lead Engine (healthy, custom_html, risk 1.0)
+  - "coaibakersfield.com"  # Bakersfield office (healthy, custom_html, risk 1.0)
+
+# ===== Platform Risk Thresholds (0-10, higher = more risky) =====
+risk:
+  no_website: 9.5
+  wix: 8.0
+  godaddy: 8.0
+  squarespace: 7.5
+  wordpress: 5.0
+  custom_outdated: 6.0
+  custom_html: 1.0
+
+# ===== Model Settings =====
+model:
+  name: "nvidia/nemotron-3-super-120b-a12b:free"
+  provider: "openrouter"
+  fallback: "gemma3:1b"

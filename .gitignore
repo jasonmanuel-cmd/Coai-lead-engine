@@ -1,0 +1,15 @@
+node_modules/
+.idea/
+.cursor/
+.vercel/
+*.log
+.env
+.env.local
+.env.*.local
+.env.txt
+.vercel
+.env*
+
+__pycache__/
+*.pyc
+!.env.example

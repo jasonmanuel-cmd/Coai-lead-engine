@@ -3,9 +3,31 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>COAI Lead Engine v2 — God Mode Prospector</title>
+<title>COAI Lead Engine — Local Business Lead Finder & Prospecting Tool</title>
+<meta name="description" content="Find and reach local business leads in minutes. Scan any city or industry, get scores, phone numbers and emails, AI-written outreach, a CRM pipeline, and CSV export. Free account — paid plans from $49/mo."/>
+<link rel="canonical" href="https://coaihq.online/"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="COAI Lead Engine"/>
+<meta property="og:title" content="COAI Lead Engine — Local Business Lead Finder"/>
+<meta property="og:description" content="Scan any city or industry for local business leads, score them, and reach out with AI-generated messages. Free to start."/>
+<meta property="og:url" content="https://coaihq.online/"/>
+<meta property="og:image" content="https://coaihq.online/og-image.png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="COAI Lead Engine — find local business leads in minutes"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://coaihq.online/og-image.png"/>
+<meta name="twitter:title" content="COAI Lead Engine — Local Business Lead Finder"/>
+<meta name="twitter:description" content="Scan any city or industry for local business leads, score them, and reach out with AI-generated messages. Free to start."/>
+<meta name="theme-color" content="#0a0a0a"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a0a0a'/%3E%3Ctext x='32' y='44' font-family='monospace' font-size='36' font-weight='bold' text-anchor='middle' fill='%2300ff88'%3E⚡%3C/text%3E%3C/svg%3E"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
+<script type="speculationrules">
+{"prerender":[{"where":{"href_matches":"/*"},"eagerness":"moderate"}]}
+</script>
 <style>
 :root{
   --black:#0a0a0a;--surface:#111;--surface2:#161616;--surface3:#1c1c1c;
@@ -162,27 +184,33 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .loader-progress{font-family:var(--mono);font-size:10px;color:var(--amber);}
 
 /* LEAD CARDS */
-.lead-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.1rem 1.3rem;margin-bottom:9px;transition:border-color 0.2s,transform 0.15s;position:relative;}
-.lead-card:hover{border-color:var(--border-hot);transform:translateX(2px);}
+.lead-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.4rem;margin-bottom:12px;position:relative;transition:all 0.15s;display:flex;flex-direction:column;gap:1rem;content-visibility:auto;contain-intrinsic-size:0 220px;}
+.lead-card:hover{border-color:var(--border-hot);background:var(--surface2);}
 .lead-card.priority-high{border-left:3px solid var(--red);}
 .lead-card.priority-med{border-left:3px solid var(--amber);}
 .lead-card.priority-low{border-left:3px solid var(--border-hot);}
 .lead-card.contacted{opacity:0.45;}
 .lead-card.closed{border-color:var(--green);background:var(--green-dim);}
-.lead-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;gap:0.5rem;}
-.lead-name{font-size:14px;font-weight:700;color:var(--white);line-height:1.3;}
-.lead-score{font-family:var(--mono);font-size:11px;font-weight:700;padding:2px 8px;border-radius:2px;flex-shrink:0;}
-.score-hot{background:rgba(255,59,48,0.15);color:var(--red);border:1px solid rgba(255,59,48,0.25);}
-.score-warm{background:rgba(255,184,0,0.12);color:var(--amber);border:1px solid rgba(255,184,0,0.2);}
-.score-cold{background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--border);}
-.lead-meta{display:flex;align-items:center;gap:8px;margin-bottom:0.5rem;flex-wrap:wrap;}
-.lead-cat-tag{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;background:var(--surface2);border:1px solid var(--border);padding:2px 7px;border-radius:2px;}
-.lead-address{font-size:11px;color:var(--muted);}
-.lead-signals{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:0.85rem;}
-.signal-tag{font-size:10px;padding:2px 7px;border-radius:2px;font-family:var(--mono);}
-.sig-bad{background:rgba(255,59,48,0.1);color:var(--red);border:1px solid rgba(255,59,48,0.15);}
-.sig-warn{background:rgba(255,184,0,0.1);color:var(--amber);border:1px solid rgba(255,184,0,0.15);}
-.sig-ok{background:rgba(0,255,136,0.08);color:var(--green);border:1px solid rgba(0,255,136,0.12);}
+.lead-top{display:flex;justify-content:space-between;align-items:flex-start;gap:1.5rem;}
+.lead-name-group{flex:1;}
+.lead-name{font-size:1.25rem;font-weight:700;line-height:1.2;margin-bottom:6px;color:var(--white);}
+.lead-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.lead-cat-tag{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(--surface3);padding:2px 8px;border-radius:2px;letter-spacing:0.06em;border:1px solid var(--border);text-transform:uppercase;}
+.lead-address{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px;}
+
+.lead-score-hero{text-align:center;min-width:75px;padding:10px;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid transparent;}
+.lsh-val{font-family:var(--mono);font-size:2rem;font-weight:700;line-height:1;}
+.lsh-lbl{font-size:9px;font-weight:700;letter-spacing:0.12em;margin-top:4px;opacity:0.85;}
+
+.score-hot{background:rgba(255,59,48,0.12);color:var(--red);border-color:rgba(255,59,48,0.25);}
+.score-warm{background:rgba(255,184,0,0.1);color:var(--amber);border-color:rgba(255,184,0,0.2);}
+.score-cold{background:rgba(255,255,255,0.03);color:var(--muted);border-color:var(--border);}
+
+.lead-signals{display:flex;gap:6px;flex-wrap:wrap;}
+.signal-tag{font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:100px;letter-spacing:0.02em;border:1px solid transparent;}
+.sig-bad{background:rgba(255,59,48,0.1);color:var(--red);border-color:rgba(255,59,48,0.25);}
+.sig-warn{background:rgba(255,184,0,0.08);color:var(--amber);border-color:rgba(255,184,0,0.2);}
+.sig-ok{background:rgba(0,255,136,0.08);color:var(--green);border-color:rgba(0,255,136,0.2);}
 .lead-actions{display:flex;gap:5px;flex-wrap:wrap;}
 .action-btn{font-family:var(--mono);font-size:10px;letter-spacing:0.05em;text-transform:uppercase;min-height:36px;padding:6px 10px;border-radius:2px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;transition:all 0.15s;}
 .action-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-dim);}
@@ -257,20 +285,100 @@ summary:focus-visible,
 /* SESSION STATS SIDEBAR */
 .session-stat{display:flex;justify-content:space-between;font-size:12px;padding:2px 0;}
 
+/* SETTINGS PANEL */
+.settings-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;}
+.settings-overlay.open{display:block;}
+.settings-panel{position:fixed;top:0;right:-420px;width:400px;height:100vh;background:var(--surface2);border-left:1px solid var(--border);z-index:301;transition:right 0.25s ease;overflow-y:auto;display:flex;flex-direction:column;}
+.settings-panel.open{right:0;}
+.settings-header{padding:1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.settings-header h3{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;color:var(--white);text-transform:uppercase;}
+.settings-close{background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;min-width:40px;min-height:40px;display:inline-flex;align-items:center;justify-content:center;border-radius:3px;}
+.settings-close:hover{color:var(--white);}
+.settings-body{padding:1.4rem;flex:1;}
+.settings-body .field{margin-bottom:1rem;}
+.settings-body .field label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;display:block;}
+.settings-body .field input,.settings-body .field select{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--white);font-family:var(--sans);font-size:13px;padding:8px 11px;border-radius:3px;outline:none;}
+.settings-body .field input:focus,.settings-body .field select:focus{border-color:var(--green);}
+.settings-body .field select option{background:var(--surface);}
+.settings-body .field small{display:block;color:var(--muted);font-size:10px;margin-top:2px;}
+.settings-footer{padding:1rem 1.4rem;border-top:1px solid var(--border);display:flex;gap:8px;}
+.settings-footer button{flex:1;min-height:40px;border-radius:3px;font-family:var(--sans);font-size:12px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:0.06em;}
+.settings-save-btn{background:var(--green);color:var(--black);border:none;}
+.settings-save-btn:hover{opacity:0.85;}
+.settings-reset-btn{background:none;border:1px solid var(--border);color:var(--muted);}
+.settings-reset-btn:hover{border-color:var(--border-hot);color:var(--white);}
+.settings-gear{background:none;border:1px solid var(--border);color:var(--muted);min-width:36px;min-height:36px;border-radius:3px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:16px;transition:all 0.15s;}
+.settings-gear:hover{border-color:var(--green);color:var(--green);}
+
+/* PIPELINE KANBAN */
+.pipeline-panel{display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
+.pipeline-panel.open{display:flex;}
+.pipeline-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;padding:0.75rem 1.5rem;border-bottom:1px solid var(--border);background:var(--surface2);}
+.pipeline-toolbar .field{margin-bottom:0;}
+.pipeline-board{flex:1;overflow-x:auto;overflow-y:hidden;padding:1rem 1.5rem;display:flex;gap:16px;}
+.pipeline-col{flex:0 0 260px;min-width:220px;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:6px;max-height:100%;overflow:hidden;}
+.pipeline-col-header{padding:0.8rem 1rem;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.pipeline-col-count{font-size:10px;color:var(--muted);background:var(--surface2);padding:2px 8px;border-radius:100px;}
+.pipeline-col-body{flex:1;overflow-y:auto;padding:0.5rem 0.6rem;display:flex;flex-direction:column;gap:8px;}
+.pipeline-card{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0.7rem;cursor:pointer;transition:all 0.15s;}
+.pipeline-card:hover{border-color:var(--border-hot);}
+.pipeline-card .pc-name{font-size:12px;font-weight:600;color:var(--white);margin-bottom:4px;}
+.pipeline-card .pc-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
+.pipeline-card .pc-tag{font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:2px;background:rgba(255,255,255,0.04);color:var(--muted);border:1px solid var(--border);}
+.pipeline-card .pc-score{font-family:var(--mono);font-size:14px;font-weight:700;}
+.pipeline-card .pc-actions{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;}
+.pipeline-card .pc-actions button{font-family:var(--mono);font-size:9px;letter-spacing:0.04em;padding:3px 8px;border-radius:2px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;min-height:28px;}
+.pipeline-card .pc-actions button:hover{border-color:var(--green);color:var(--green);}
+.pipeline-col-empty{padding:1rem;text-align:center;color:var(--muted);font-size:11px;}
+
 @media(max-width:900px){
   .app{grid-template-columns:1fr;height:auto;}
   .sidebar{border-right:none;border-bottom:1px solid var(--border);}
   .main{height:80vh;}
+  .settings-panel{width:100%;right:-100%;}
+}
+@media(max-width:640px){
+  header{padding:0 1rem;}
+  .header-status{display:none;}
+  .god-badge{display:none;}
+  .logo .ver{display:none;}
+  .stats-row{grid-template-columns:repeat(2,1fr);padding:0.9rem 1rem;}
+  .filter-row,.sort-row{padding-left:1rem;padding-right:1rem;}
+  .export-bar{flex-wrap:wrap;}
+  .export-bar>div:last-child{flex-wrap:wrap;display:flex;}
+  .msg-type-row{grid-template-columns:1fr;}
+  .modal-actions{flex-wrap:wrap;}
+  .modal-actions .copy-btn{flex:1 1 100%;}
+  .modal-actions .dismiss-btn{flex:1 1 auto;}
+  .modal-header,.modal-body{padding-left:1.1rem;padding-right:1.1rem;}
+  .bulk-bar{flex-wrap:wrap;}
 }
 </style>
+<script>
+  // Owner-only controls (GOD MODE badge, owner key, site traffic) stay hidden from
+  // customers. The owner turns them on once per browser with /app?owner=1
+  // (/app?owner=0 turns them off); a saved owner key also turns them on.
+  (function () {
+    try {
+      var q = new URLSearchParams(location.search).get('owner');
+      if (q === '1') localStorage.setItem('coai_owner', '1');
+      if (q === '0') { localStorage.removeItem('coai_owner'); sessionStorage.removeItem('coai_auth'); }
+      if (localStorage.getItem('coai_owner') === '1' || sessionStorage.getItem('coai_auth')) {
+        document.documentElement.classList.add('owner-mode');
+      }
+    } catch (e) {}
+  })();
+</script>
+<style>html:not(.owner-mode) .owner-only{display:none !important;}</style>
 </head>
 <body>
 
 <header>
   <div class="logo">COAI <span>LEAD ENGINE</span><span class="ver">v2.0</span></div>
   <div class="header-right">
-    <div class="god-badge">⚡ GOD MODE</div>
+    <div class="god-badge owner-only">⚡ GOD MODE</div>
     <div class="header-status"><span class="pulse"></span>PROSPECTOR READY</div>
+    <button class="settings-gear" onclick="toggleSettings()" title="Settings" aria-label="Open settings">⚙</button>
   </div>
 </header>
 
@@ -284,16 +392,16 @@ summary:focus-visible,
     <div class="sidebar-section">
       <div class="field">
         <label>City / Area</label>
-        <input type="text" id="location" value="Bakersfield, CA" placeholder="City, State"/>
+        <input type="text" id="location" value="" placeholder="City, State — e.g. Austin, TX"/>
       </div>
       <div class="field">
         <label>Radius</label>
         <select id="radius">
-          <option value="2000">2 miles — Core 661</option>
-          <option value="5000" selected>5 miles — Greater Bakersfield</option>
-          <option value="10000">10 miles — Kern County</option>
-          <option value="25000">25 miles — Central Valley</option>
-          <option value="50000">50 miles — Max Range</option>
+          <option value="2000">2 miles — City core</option>
+          <option value="5000" selected>5 miles — City + nearby</option>
+          <option value="10000">10 miles — Metro area</option>
+          <option value="25000">25 miles — Greater metro</option>
+          <option value="50000">50 miles — Max range</option>
         </select>
       </div>
     </div>
@@ -453,6 +561,13 @@ summary:focus-visible,
         </div>
         <div class="cat-grid">
           <div class="cat-btn" data-cat="smoke shop" data-vertical="retail" onclick="toggleCat(this)">Smoke Shop</div>
+          <div class="cat-btn" data-cat="head shop" data-vertical="retail" onclick="toggleCat(this)">Head Shop</div>
+          <div class="cat-btn" data-cat="vape shop" data-vertical="retail" onclick="toggleCat(this)">Vape Shop</div>
+          <div class="cat-btn" data-cat="tobacco shop" data-vertical="retail" onclick="toggleCat(this)">Tobacco Shop</div>
+          <div class="cat-btn" data-cat="CBD store" data-vertical="retail" onclick="toggleCat(this)">CBD Store</div>
+          <div class="cat-btn" data-cat="glass shop" data-vertical="retail" onclick="toggleCat(this)">Glass Shop</div>
+          <div class="cat-btn" data-cat="hookah shop" data-vertical="retail" onclick="toggleCat(this)">Hookah Shop</div>
+          <div class="cat-btn" data-cat="kratom shop" data-vertical="retail" onclick="toggleCat(this)">Kratom Shop</div>
           <div class="cat-btn" data-cat="jewelry store" data-vertical="retail" onclick="toggleCat(this)">Jewelry</div>
           <div class="cat-btn" data-cat="pawn shop" data-vertical="retail" onclick="toggleCat(this)">Pawn Shop</div>
           <div class="cat-btn" data-cat="music store" data-vertical="retail" onclick="toggleCat(this)">Music Store</div>
@@ -693,8 +808,13 @@ summary:focus-visible,
         <label for="dedupe-name-address">Dedupe by normalized name + address</label>
       </div>
       <div class="check-row">
-        <input type="checkbox" id="enrich-after-scan" checked/>
-        <label for="enrich-after-scan">Auto-enrich websites after scan</label>
+        <input type="checkbox" id="enrich-after-scan"/>
+        <label for="enrich-after-scan">Auto-find emails after scan (1 call per website)</label>
+      </div>
+      <div style="display:flex;gap:4px;margin-bottom:10px;">
+        <button class="gsr-btn" style="font-size:9px;flex:1;" onclick="applyScorePreset('default')">Default</button>
+        <button class="gsr-btn" style="font-size:9px;flex:1;" onclick="applyScorePreset('aggressive')">Aggressive</button>
+        <button class="gsr-btn" style="font-size:9px;flex:1;" onclick="applyScorePreset('conservative')">Conservative</button>
       </div>
       <div class="options-grid">
         <div class="field">
@@ -726,13 +846,27 @@ summary:focus-visible,
     </details>
 
     <div class="sidebar-section">
-      <div class="sidebar-label">API Key Required</div>
-      <div class="field">
-        <label>Google Places API Key</label>
-        <input type="password" id="api-key" placeholder="AIza..."/>
+      <div class="sidebar-label">Account</div>
+      <div id="account-logged-out" style="display:flex;flex-direction:column;gap:7px;">
+        <button class="search-btn" style="font-size:11px;" onclick="openAuthModal('login')">⭕ LOG IN</button>
+        <button class="gsr-btn" style="font-size:10px;" onclick="openAuthModal('signup')">⚡ Create free account — 1 full scan free</button>
+        <small style="color:var(--muted);">Free accounts get 50 API calls/month — enough for one full scan. Upgrade to Starter ($49/mo) or Pro ($99/mo) for more. The Google API key stays server-side — never exposed to the browser.</small>
       </div>
-      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);line-height:1.6;margin-top:4px;">
-        Google Cloud → enable <strong style="color:var(--white);">Places API</strong> + <strong style="color:var(--white);">Geocoding API</strong>. Nearby Search omits most phones and websites; this app calls <strong style="color:var(--green);">Place Details</strong> per listing so data matches the Google Maps profile. Leave <strong style="color:var(--white);">Skip Place Details</strong> off unless you want a faster, less accurate scan.
+      <div id="account-logged-in" style="display:none;flex-direction:column;gap:7px;">
+        <div class="session-stat"><span style="color:var(--muted);">Account</span><span id="acct-email" style="color:var(--white);font-family:var(--mono);font-size:10px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span></div>
+        <div class="session-stat"><span style="color:var(--muted);">Plan</span><span id="acct-plan" style="color:var(--green);font-family:var(--mono);font-size:10px;"></span></div>
+        <div class="session-stat"><span style="color:var(--muted);">Usage</span><span id="acct-usage" style="color:var(--white);font-family:var(--mono);font-size:10px;"></span></div>
+        <div id="acct-usage-bar" style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:2px;"><div id="acct-usage-fill" style="height:100%;width:0%;background:var(--green);"></div></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+          <button class="gsr-btn" style="font-size:9px;" onclick="openPricingModal()">⚡ Upgrade</button>
+          <button class="gsr-btn" style="font-size:9px;" onclick="openBillingPortal()">Manage</button>
+          <button class="gsr-btn" style="font-size:9px;" onclick="doLogout()">Log out</button>
+        </div>
+      </div>
+      <div class="field owner-only" style="margin-top:10px;">
+        <label>Owner key (optional)</label>
+        <input type="password" id="app-password" placeholder="Admin master key…"/>
+        <small style="color:var(--muted);">Optional — the owner's APP_PASSWORD overrides login (unlimited).</small>
       </div>
       <button class="search-btn" id="search-btn" onclick="runSearch()">
         ◉ SCAN FOR LEADS
@@ -748,10 +882,20 @@ summary:focus-visible,
         <div class="session-stat"><span style="color:var(--muted);">Contacted</span><span id="s-contacted" style="color:var(--amber);font-family:var(--mono);">0</span></div>
         <div class="session-stat"><span style="color:var(--muted);">Closed</span><span id="s-closed" style="color:var(--green);font-family:var(--mono);">0</span></div>
       </div>
+      <div class="owner-only" style="margin-top:12px;border-top:1px dashed var(--border);padding-top:10px;">
+        <div class="sidebar-label" style="margin-bottom:6px;">Site Traffic (owner) <button type="button" class="gsr-btn" style="font-size:9px;padding:2px 8px;" onclick="loadAnalytics()">↻ refresh</button></div>
+        <div id="owner-analytics" style="font-family:var(--mono);font-size:11px;line-height:1.7;color:var(--muted);">Enter the owner key, then hit refresh.</div>
+      </div>
       <div class="check-row" style="margin-top:10px;">
         <input type="checkbox" id="crm-clear-before-scan"/>
         <label for="crm-clear-before-scan">Clear CRM before next scan (replace all)</label>
       </div>
+      <div style="display:flex;gap:6px;margin-top:10px;">
+        <button class="gsr-btn" style="font-size:9px;" onclick="exportCRMBackup()">↓ Backup JSON</button>
+        <button class="gsr-btn" style="font-size:9px;" onclick="importCRMBackup()">↑ Restore JSON</button>
+      </div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:6px;line-height:1.5;">Your leads are saved in this browser only. Back up before clearing browser data or switching devices.</div>
+      <input type="file" id="crm-import-file" accept=".json" style="display:none" onchange="handleCRMImportFile(this)"/>
     </div>
 
   </div>
@@ -761,14 +905,15 @@ summary:focus-visible,
     <div class="main-mode-bar" id="main-mode-bar" style="display:none;">
       <button type="button" class="mode-tab active" id="tab-prospector" onclick="setMainMode('prospector')">Prospector</button>
       <button type="button" class="mode-tab" id="tab-crm" onclick="setMainMode('crm')">CRM</button>
+      <button type="button" class="mode-tab" id="tab-pipeline" onclick="setMainMode('pipeline')">Pipeline</button>
       <span class="crm-persist-hint">CRM auto-saves in this browser</span>
     </div>
     <div id="prospector-panel" class="prospector-panel">
     <div class="stats-row" id="stats-row" style="display:none;">
-      <div class="stat-box"><div class="stat-num green" id="st-found">0</div><div class="stat-lbl">Total Found</div></div>
-      <div class="stat-box"><div class="stat-num red" id="st-nosite">0</div><div class="stat-lbl">No Website</div></div>
-      <div class="stat-box"><div class="stat-num amber" id="st-lowrated">0</div><div class="stat-lbl">Low Rated</div></div>
-      <div class="stat-box"><div class="stat-num blue" id="st-cats">0</div><div class="stat-lbl">Categories</div></div>
+      <div class="stat-box"><div class="stat-lbl">TOTAL FOUND</div><div class="stat-num green" id="st-found">0</div></div>
+      <div class="stat-box" style="border-color:var(--red);"><div class="stat-lbl">🔥 HOT LEADS</div><div class="stat-num red" id="st-hot-stats">0</div></div>
+      <div class="stat-box"><div class="stat-lbl">NO WEBSITE</div><div class="stat-num amber" id="st-nosite">0</div></div>
+      <div class="stat-box"><div class="stat-lbl">CATEGORIES</div><div class="stat-num blue" id="st-cats">0</div></div>
     </div>
 
     <div class="filter-row" id="filter-row" style="display:none;">
@@ -778,6 +923,8 @@ summary:focus-visible,
       <div class="filter-chip" onclick="filterLeads('lowrated',this)">Low Rated</div>
       <div class="filter-chip" onclick="filterLeads('notcontacted',this)">Not Contacted</div>
       <div class="filter-chip" onclick="filterLeads('nosite_norating',this)">No Site + No Rating</div>
+      <div class="filter-chip" onclick="filterLeads('enriched',this)">Enriched</div>
+      <div class="filter-chip" onclick="filterLeads('notenriched',this)">Not Enriched</div>
     </div>
 
     <div class="sort-row" id="sort-row" style="display:none;">
@@ -790,11 +937,19 @@ summary:focus-visible,
       </select>
     </div>
 
+    <div class="bulk-bar" id="bulk-bar" style="display:none;padding:0.6rem 1.5rem;border-bottom:1px solid var(--border);background:var(--surface2);align-items:center;gap:10px;">
+      <span style="font-family:var(--mono);font-size:11px;color:var(--muted);" id="bulk-count">0 selected</span>
+      <button class="export-btn" style="font-size:10px;min-height:32px;padding:4px 10px;" onclick="bulkMarkContacted()">Mark Contacted</button>
+      <button class="export-btn" style="font-size:10px;min-height:32px;padding:4px 10px;border-color:rgba(0,255,136,0.3);color:var(--green);" onclick="bulkMarkClosed()">Mark Closed</button>
+      <button class="export-btn" style="font-size:10px;min-height:32px;padding:4px 10px;border-color:rgba(255,59,48,0.35);color:var(--red);" onclick="bulkDeleteSelected()">Delete Selected</button>
+      <button class="export-btn" style="font-size:10px;min-height:32px;padding:4px 10px;" onclick="bulkExportCSV()">Export CSV</button>
+      <button class="export-btn" style="font-size:10px;min-height:32px;padding:4px 10px;margin-left:auto;" onclick="bulkClearSelection()">✕ Clear</button>
+    </div>
     <div class="results-wrap" id="results-wrap">
       <div class="empty-state" id="empty-state">
         <div class="empty-icon">◉</div>
-        <div class="empty-title">God Mode Ready</div>
-        <p class="empty-sub">Pick industries, set radius, scan. Each result is enriched with Google Place Details (phone + website) so scores match what you see on Maps—not the thin Nearby Search payload alone.</p>
+        <div class="empty-title">Ready to Scan</div>
+        <p class="empty-sub">Pick industries, set radius, scan. Finds any local businesses — dentists, roofers, restaurants, law firms, shops, and 100+ more categories. Each result is enriched with Google Place Details (phone + website) so you can reach out immediately.</p>
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.2rem;margin-top:1rem;max-width:340px;text-align:left;">
           <div style="font-family:var(--mono);font-size:9px;color:var(--green);letter-spacing:0.14em;margin-bottom:0.75rem;">HOT LEAD SIGNALS</div>
           <div style="font-size:12px;color:var(--muted);line-height:2.1;">
@@ -821,7 +976,37 @@ summary:focus-visible,
       <div style="display:flex;gap:8px;">
         <button class="export-btn primary" onclick="exportCSV()">↓ Export CSV</button>
         <button class="export-btn" onclick="exportHotCSV()">↓ Hot Only CSV</button>
+        <button class="export-btn" onclick="enrichAllLeads()" title="Looks up each lead's website for an email and phone. Uses 1 call per website.">✉ Find Emails</button>
+        <button class="export-btn" onclick="exportCRMBackup()" title="Your leads are saved in this browser only. Download a backup you can restore later.">↓ Backup</button>
+        <button class="export-btn" onclick="openWebhookModal()" style="border-color:var(--purple);color:var(--purple);">Webhook / Zapier</button>
         <button class="export-btn" onclick="clearAll()">✕ Clear All</button>
+      </div>
+    </div>
+
+    <!-- WEBHOOK MODAL -->
+    <div id="webhook-modal" class="modal-overlay" onclick="closeWebhookModal(event)">
+      <div class="modal-content" style="max-width:480px;">
+        <div class="modal-header">
+          <div class="modal-title">Push to Webhook (Zapier/Make/GHL)</div>
+          <button class="close-btn" onclick="closeWebhookModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="field">
+            <label>Webhook URL</label>
+            <input type="text" id="webhook-url" placeholder="https://hooks.zapier.com/..." />
+            <small>Leads will be sent to this URL when you click "Push".</small>
+          </div>
+          <div class="field">
+            <label>Target Segment</label>
+            <select id="webhook-segment">
+              <option value="all">Push ALL Leads</option>
+              <option value="hot">Push HOT Only</option>
+              <option value="new">Push UNCONTACTED Only</option>
+            </select>
+          </div>
+          <button id="webhook-push-btn" class="search-btn" style="background:var(--purple);color:white;" onclick="pushToWebhook()">🚀 PUSH TO WEBHOOK</button>
+          <div id="webhook-status" style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:center;"></div>
+        </div>
       </div>
     </div>
     </div>
@@ -852,14 +1037,143 @@ summary:focus-visible,
           <button type="button" onclick="crmBulkMarkNew()">Mark new</button>
           <button type="button" class="crm-danger" onclick="crmBulkDelete()">Delete selected</button>
         </div>
+        <div class="check-row" style="margin-left:auto;flex-shrink:0;">
+          <input type="checkbox" id="crm-notes-only" onchange="renderCRMTable()"/>
+          <label for="crm-notes-only">Notes only</label>
+        </div>
       </div>
       <div class="crm-table-wrap" id="crm-table-wrap"></div>
+    </div>
+
+    <!-- PIPELINE KANBAN -->
+    <div id="pipeline-panel" class="pipeline-panel">
+      <div class="pipeline-toolbar">
+        <div class="field" style="flex:1;min-width:120px;">
+          <label>Category</label>
+          <select id="pipeline-filter-cat" onchange="renderPipeline()">
+            <option value="">All categories</option>
+          </select>
+        </div>
+        <div class="field" style="flex:1;min-width:120px;">
+          <label>Min Score</label>
+          <select id="pipeline-min-score" onchange="renderPipeline()">
+            <option value="0">Any</option>
+            <option value="25">25+</option>
+            <option value="50">50+ (Hot)</option>
+          </select>
+        </div>
+      </div>
+      <div class="pipeline-board" id="pipeline-board"></div>
     </div>
   </div>
 
 </div>
 
 <!-- OUTREACH MODAL -->
+<div class="modal-overlay" id="auth-modal" onclick="closeAuthModal(event)">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:380px;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="auth-modal-title">Log In</div>
+        <div class="modal-biz">COAI Lead Engine</div>
+      </div>
+      <button class="modal-close" onclick="closeAuthModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field" style="margin-bottom:10px;" id="auth-email-field">
+        <label>Email</label>
+        <input type="email" id="auth-email" placeholder="you@company.com" autocomplete="email" onkeydown="if(event.key==='Enter')submitAuth()"/>
+      </div>
+      <div class="field" style="margin-bottom:10px;display:none;" id="auth-name-field">
+        <label>Name (optional)</label>
+        <input id="auth-name" placeholder="Your name" autocomplete="name" onkeydown="if(event.key==='Enter')submitAuth()"/>
+      </div>
+      <div class="field" style="margin-bottom:14px;" id="auth-pass-field">
+        <label><span id="auth-pass-label">Password</span> <span id="auth-pass-hint">(8+ characters)</span></label>
+        <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitAuth()"/>
+      </div>
+      <div id="auth-error" style="color:var(--red);font-size:11px;margin-bottom:10px;display:none;"></div>
+      <div id="auth-success" style="color:var(--green);font-size:11px;margin-bottom:10px;display:none;line-height:1.6;"></div>
+      <div class="modal-actions" style="justify-content:space-between;">
+        <button class="gsr-btn" id="auth-switch-btn" onclick="switchAuthMode()">Create account</button>
+        <button class="search-btn" style="flex:1;font-size:11px;" id="auth-submit-btn" onclick="submitAuth()">LOG IN</button>
+      </div>
+      <div style="text-align:right;margin-top:8px;" id="auth-forgot-row">
+        <a href="#" onclick="openAuthModal('forgot');return false;" style="color:var(--muted);font-size:11px;">Forgot password?</a>
+      </div>
+      <small id="auth-tos-note" style="color:var(--muted);display:block;margin-top:10px;">By creating an account you agree to the <a href="/tos" style="color:var(--green);">Terms of Service</a> and <a href="/privacy" style="color:var(--green);">Privacy Policy</a>.</small>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="pricing-modal" onclick="closePricingModal(event)">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:620px;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">⚡ Upgrade — unlock more scans</div>
+        <div class="modal-biz">Cancel anytime · Secure checkout via Stripe</div>
+      </div>
+      <button class="modal-close" onclick="closePricingModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:230px;border:1px solid var(--border);border-radius:4px;padding:16px;">
+          <div style="font-weight:700;letter-spacing:1px;">STARTER</div>
+          <div style="font-family:var(--mono);font-size:24px;color:var(--green);margin:6px 0;">$49<span style="font-size:11px;color:var(--muted);">/month</span></div>
+          <ul style="font-size:11px;color:var(--muted);list-style:none;margin:10px 0;display:flex;flex-direction:column;gap:5px;">
+            <li>✓ 1,500 API calls / month (≈ 30+ full scans)</li>
+            <li>✓ Full industry library (100+ categories)</li>
+            <li>✓ CSV export + webhook push</li>
+            <li>✓ AI outreach generator</li>
+            <li>✓ Opportunity scoring</li>
+          </ul>
+          <button class="search-btn" style="width:100%;font-size:11px;" onclick="startCheckout('starter')">⚡ GET STARTER</button>
+        </div>
+        <div style="flex:1;min-width:230px;border:1px solid var(--red);border-radius:4px;padding:16px;position:relative;">
+          <div style="position:absolute;top:-9px;right:12px;background:var(--red);color:#fff;font-size:9px;font-family:var(--mono);padding:2px 8px;border-radius:2px;letter-spacing:1px;">BEST VALUE</div>
+          <div style="font-weight:700;letter-spacing:1px;">PRO 🔥</div>
+          <div style="font-family:var(--mono);font-size:24px;color:var(--green);margin:6px 0;">$99<span style="font-size:11px;color:var(--muted);">/month</span></div>
+          <ul style="font-size:11px;color:var(--muted);list-style:none;margin:10px 0;display:flex;flex-direction:column;gap:5px;">
+            <li>✓ 5,000 API calls / month (≈ 100+ full scans)</li>
+            <li>✓ Everything in Starter</li>
+            <li>✓ Priority support</li>
+            <li>✓ Best for agencies</li>
+            <li>✓ Cancel anytime</li>
+          </ul>
+          <button class="search-btn" style="width:100%;font-size:11px;border-color:var(--red);" onclick="startCheckout('pro')">🔥 GET PRO</button>
+        </div>
+      </div>
+      <small style="color:var(--muted);display:block;margin-top:12px;">Need to cancel or change your card later? Use the "Manage" button in the sidebar — self-serve Stripe billing portal.</small>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="welcome-modal" onclick="closeWelcome(event)">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:420px;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">⚡ Welcome to COAI Lead Engine</div>
+        <div class="modal-biz">Your first scan is 60 seconds away</div>
+      </div>
+      <button class="modal-close" onclick="closeWelcome()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--muted);">
+        <div><span style="color:var(--green);font-family:var(--mono);">1.</span> Enter a <strong style="color:var(--white);">city</strong> in the sidebar (e.g. Austin, TX)</div>
+        <div><span style="color:var(--green);font-family:var(--mono);">2.</span> Pick one or more <strong style="color:var(--white);">industry categories</strong></div>
+        <div><span style="color:var(--green);font-family:var(--mono);">3.</span> Hit <strong style="color:var(--white);">◉ SCAN FOR LEADS</strong> — hot leads score highest</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:10px 12px;margin-top:14px;font-size:12px;color:var(--muted);">
+        ⚙ Tip: fill in your <strong style="color:var(--white);">Settings profile</strong> (name, business, offer) so outreach + AI messages sound like you.
+      </div>
+      <div class="modal-actions" style="margin-top:14px;">
+        <button class="copy-btn" onclick="closeWelcome()">Run my first scan</button>
+        <button class="dismiss-btn" onclick="welcomeGoProfile()">Set up profile</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-header">
@@ -878,17 +1192,81 @@ summary:focus-visible,
       </div>
       <div class="sidebar-label" style="margin-bottom:0.75rem;">Message Preview</div>
       <div class="msg-preview" id="msg-preview"></div>
+      <small style="color:var(--muted);display:block;margin:-6px 0 12px;">Tip: set your name, business &amp; offer in ⚙ Settings so every message sounds like you.</small>
       <div class="modal-actions">
         <button class="copy-btn" onclick="copyMsg()">Copy Message</button>
+        <button class="dismiss-btn" id="ai-gen-btn" onclick="generateAIOutreach()" style="border-color:rgba(167,139,250,0.4);color:#a78bfa;">⚡ AI Personalize</button>
+        <button class="dismiss-btn" onclick="generateOpportunityReport()" style="border-color:rgba(255,184,0,0.4);color:var(--amber);">📄 Download Audit PDF</button>
         <button class="dismiss-btn" onclick="closeModal()">Close</button>
       </div>
     </div>
   </div>
 </div>
 
+<!-- SETTINGS PANEL -->
+<div class="settings-overlay" id="settings-overlay" onclick="closeSettings(event)"></div>
+<div class="settings-panel" id="settings-panel">
+  <div class="settings-header">
+    <h3>⚙ Settings</h3>
+    <button class="settings-close" onclick="closeSettings()">×</button>
+  </div>
+  <div class="settings-body">
+    <div class="field">
+      <label>Business Name</label>
+      <input type="text" id="set-business-name" placeholder="Your business name"/>
+    </div>
+    <div class="field">
+      <label>Owner / Rep Name</label>
+      <input type="text" id="set-owner-name" placeholder="Your name"/>
+    </div>
+    <div class="field">
+      <label>Phone Number</label>
+      <input type="text" id="set-phone" placeholder="(555) 123-4567"/>
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="set-email" placeholder="you@example.com"/>
+    </div>
+    <div class="field">
+      <label>Location</label>
+      <input type="text" id="set-address" placeholder="City, State"/>
+    </div>
+    <div class="field">
+      <label>Website (optional)</label>
+      <input type="text" id="set-website" placeholder="yourstore.com"/>
+    </div>
+    <div class="field">
+      <label>Pricing / Offer</label>
+      <input type="text" id="set-price" placeholder="e.g. Websites starting at $500"/>
+    </div>
+    <div class="field">
+      <label>Outreach Tone</label>
+      <select id="set-tone">
+        <option value="casual">Casual — Hey, quick question...</option>
+        <option value="professional">Professional — Dear business owner...</option>
+        <option value="direct">Direct — Here's what I noticed...</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>AI Provider</label>
+      <select id="set-ai-provider">
+        <option value="gemini">Gemini (default — free)</option>
+        <option value="perplexity">Perplexity</option>
+        <option value="anthropic">Anthropic Claude</option>
+      </select>
+      <small>AI personalization runs on our servers — no setup needed. Your profile above is what the AI writes with.</small>
+    </div>
+  </div>
+  <div class="settings-footer">
+    <button class="settings-save-btn" onclick="saveSettings()">Save</button>
+    <button class="settings-reset-btn" onclick="resetDefaultSettings()">Reset</button>
+  </div>
+</div>
+
 <script>
 // ─── STATE ───
 const CRM_LS_KEY = 'coai_lead_crm_v1';
+const SETTINGS_LS_KEY = 'coai_settings_v1';
 let allLeads = [];
 let currentFilter = 'all';
 let activeLead = null;
@@ -899,6 +1277,7 @@ let activeCats = new Set();
 let scannedCatCount = 0;
 let mainMode = 'prospector';
 let crmSelected = new Set();
+const searchCache = new Map();
 let crmExpandId = null;
 
 // ─── UTIL ───
@@ -909,6 +1288,94 @@ function escapeHtml(str){
     .replace(/</g,'&lt;')
     .replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;');
+}
+
+const DEFAULT_SETTINGS = {
+  businessName: '',
+  ownerName: '',
+  phone: '',
+  email: '',
+  address: '',
+  website: '',
+  price: '',
+  tone: 'casual',
+  aiProvider: 'gemini'
+};
+
+let appSettings = { ...DEFAULT_SETTINGS };
+
+function loadSettings(){
+  try{
+    const raw = localStorage.getItem(SETTINGS_LS_KEY);
+    if(!raw) return;
+    const data = JSON.parse(raw);
+    if(data && typeof data === 'object') appSettings = { ...DEFAULT_SETTINGS, ...data };
+  }catch(e){ console.warn('Settings load failed', e); }
+}
+
+function saveSettingsToStorage(){
+  try{
+    localStorage.setItem(SETTINGS_LS_KEY, JSON.stringify(appSettings));
+  }catch(e){ console.warn('Settings save failed', e); }
+}
+
+function syncSettingsToForm(){
+  document.getElementById('set-business-name').value = appSettings.businessName || '';
+  document.getElementById('set-owner-name').value = appSettings.ownerName || '';
+  document.getElementById('set-phone').value = appSettings.phone || '';
+  document.getElementById('set-email').value = appSettings.email || '';
+  document.getElementById('set-address').value = appSettings.address || '';
+  document.getElementById('set-website').value = appSettings.website || '';
+  document.getElementById('set-price').value = appSettings.price || '';
+  document.getElementById('set-tone').value = appSettings.tone || 'casual';
+  document.getElementById('set-ai-provider').value = appSettings.aiProvider || 'gemini';
+}
+
+function syncSettingsFromForm(){
+  appSettings.businessName = document.getElementById('set-business-name').value.trim();
+  appSettings.ownerName = document.getElementById('set-owner-name').value.trim();
+  appSettings.phone = document.getElementById('set-phone').value.trim();
+  appSettings.email = document.getElementById('set-email').value.trim();
+  appSettings.address = document.getElementById('set-address').value.trim();
+  appSettings.website = document.getElementById('set-website').value.trim();
+  appSettings.price = document.getElementById('set-price').value.trim();
+  appSettings.tone = document.getElementById('set-tone').value;
+  appSettings.aiProvider = document.getElementById('set-ai-provider').value;
+}
+
+function toggleSettings(){
+  const panel = document.getElementById('settings-panel');
+  const overlay = document.getElementById('settings-overlay');
+  const isOpen = panel.classList.contains('open');
+  if(isOpen){
+    panel.classList.remove('open');
+    overlay.classList.remove('open');
+  }else{
+    syncSettingsToForm();
+    panel.classList.add('open');
+    overlay.classList.add('open');
+  }
+}
+
+function closeSettings(e){
+  if(!e || e.target === document.getElementById('settings-overlay')){
+    document.getElementById('settings-panel').classList.remove('open');
+    document.getElementById('settings-overlay').classList.remove('open');
+  }
+}
+
+function saveSettings(){
+  syncSettingsFromForm();
+  saveSettingsToStorage();
+  document.getElementById('settings-panel').classList.remove('open');
+  document.getElementById('settings-overlay').classList.remove('open');
+}
+
+function resetDefaultSettings(){
+  if(!confirm('Reset all settings to defaults?')) return;
+  appSettings = { ...DEFAULT_SETTINGS };
+  syncSettingsToForm();
+  saveSettingsToStorage();
 }
 
 function saveCRMToStorage(){
@@ -951,21 +1418,27 @@ function updateMainChromeVisibility(){
 }
 
 function setMainMode(mode){
-  mainMode = mode === 'crm' ? 'crm' : 'prospector';
+  mainMode = mode === 'crm' ? 'crm' : mode === 'pipeline' ? 'pipeline' : 'prospector';
   const tabP = document.getElementById('tab-prospector');
   const tabC = document.getElementById('tab-crm');
+  const tabPi = document.getElementById('tab-pipeline');
   const panelP = document.getElementById('prospector-panel');
   const panelC = document.getElementById('crm-panel');
+  const panelPi = document.getElementById('pipeline-panel');
   if(tabP) tabP.classList.toggle('active', mainMode === 'prospector');
   if(tabC) tabC.classList.toggle('active', mainMode === 'crm');
+  if(tabPi) tabPi.classList.toggle('active', mainMode === 'pipeline');
   if(panelP) panelP.style.display = mainMode === 'prospector' ? 'flex' : 'none';
-  if(panelC){
-    panelC.classList.toggle('open', mainMode === 'crm');
-    panelC.style.display = mainMode === 'crm' ? 'flex' : 'none';
-  }
+  if(panelC) panelC.style.display = mainMode === 'crm' ? 'flex' : 'none';
+  if(panelC) panelC.classList.toggle('open', mainMode === 'crm');
+  if(panelPi) panelPi.style.display = mainMode === 'pipeline' ? 'flex' : 'none';
+  if(panelPi) panelPi.classList.toggle('open', mainMode === 'pipeline');
   if(mainMode === 'crm'){
     repopulateCrmCategorySelect();
     renderCRMTable();
+  }else if(mainMode === 'pipeline'){
+    repopulatePipelineCategorySelect();
+    renderPipeline();
   }else{
     applySortAndRender();
   }
@@ -992,8 +1465,13 @@ function repopulateCrmCategorySelect(){
   if(prevCat && cats.includes(prevCat)) sel.value = encodeURIComponent(prevCat);
 }
 
+const debouncedCrmSearch = (function(){
+  let t;
+  return function(){ clearTimeout(t); t = setTimeout(renderCRMTable, 150); };
+})();
+
 function onCrmSearchInput(){
-  renderCRMTable();
+  debouncedCrmSearch();
 }
 
 function getLeadCrmStatus(id){
@@ -1009,6 +1487,8 @@ function getFilteredLeads(){
   else if(currentFilter === 'lowrated') filtered = filtered.filter(l=>l.rating>0&&l.rating<4);
   else if(currentFilter === 'notcontacted') filtered = filtered.filter(l=>!contacted.has(l.id)&&!closed.has(l.id));
   else if(currentFilter === 'nosite_norating') filtered = filtered.filter(l=>!l.hasWebsite&&l.rating===0);
+  else if(currentFilter === 'enriched') filtered = filtered.filter(l=>l.enriched&&(l.enrichedPhone||l.enrichedEmail));
+  else if(currentFilter === 'notenriched') filtered = filtered.filter(l=>!l.enriched||!(l.enrichedPhone||l.enrichedEmail));
   return filtered;
 }
 
@@ -1024,7 +1504,9 @@ function getCRMFilteredLeads(){
   else if(st === 'contacted') rows = rows.filter(l => getLeadCrmStatus(l.id) === 'contacted');
   else if(st === 'closed') rows = rows.filter(l => getLeadCrmStatus(l.id) === 'closed');
   if(q){
+    const notesOnly = document.getElementById('crm-notes-only')?.checked;
     rows = rows.filter(l => {
+      if(notesOnly) return (l.note || '').toLowerCase().includes(q);
       const blob = [
         l.name, l.address, l.cat, l.phone, l.enrichedPhone, l.enrichedEmail, l.website, l.note
       ].filter(Boolean).join(' ').toLowerCase();
@@ -1137,29 +1619,307 @@ function selectHotOnly(){
   updateCatCount();
 }
 
-// ─── CORS PROXY FETCH ───
-async function gFetch(googleUrl){
-  const proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(googleUrl);
-  const resp = await fetch(proxy, {signal: AbortSignal.timeout(15000)});
-  if(!resp.ok) throw new Error('Proxy fetch failed (status ' + resp.status + ').');
-  const wrapper = await resp.json();
-  if(!wrapper.contents) throw new Error('Proxy returned empty response. Try again.');
-  return JSON.parse(wrapper.contents);
+// ─── SERVER FETCH — all Google calls go through our own Vercel backend ───
+// The Google API key never touches the browser. Auth key is stored in sessionStorage.
+async function serverFetch(params){
+  const authKey = sessionStorage.getItem('coai_auth') || '';
+  const qs = Object.entries(params)
+    .filter(([,v]) => v !== undefined && v !== null && v !== '')
+    .map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+    .join('&');
+  const resp = await fetch('/api/search?' + qs, {
+    headers: { 'Authorization': authKey },
+    signal: AbortSignal.timeout(20000)
+  });
+  if(!resp.ok){
+    const errBody = await resp.json().catch(()=>({}));
+    if(resp.status === 402){
+      const e = new Error('QUOTA_EXCEEDED: ' + (errBody.error || 'Monthly quota reached — upgrade to keep scanning.'));
+      e.quota = true;
+      throw e;
+    }
+    if(resp.status === 401){
+      const e = new Error('LOGIN_REQUIRED: ' + (errBody.error || 'Please sign in.'));
+      e.auth = true;
+      throw e;
+    }
+    throw new Error(errBody.error || 'Server error: ' + resp.status);
+  }
+  return resp.json();
 }
 
 // ─── SLEEP ───
 function sleep(ms){return new Promise(r => setTimeout(r, ms));}
 
-// Nearby Search often omits website + phone; Place Details returns what you see on Maps.
-async function enrichPlaceWithDetails(place, apiKey){
-  if(!place || !place.place_id) return place;
-  const fields = [
-    'formatted_phone_number','international_phone_number','website','formatted_address',
-    'opening_hours','business_status','rating','user_ratings_total','url'
-  ].join(',');
-  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(place.place_id)}&fields=${fields}&key=${encodeURIComponent(apiKey)}`;
+// ─── ACCOUNT / BILLING (SaaS) ─────────────────────────────────────────
+let accountState = null; // null = logged out; { email, plan, planName, usage, quota, ... }
+
+async function refreshAccount(){
   try{
-    const data = await gFetch(url);
+    const resp = await fetch('/api/auth');
+    const data = await resp.json().catch(()=>({authenticated:false}));
+    accountState = data.authenticated ? data : null;
+    renderAccountUI();
+  }catch(e){
+    console.warn('Account check failed:', e.message);
+  }
+}
+
+function renderAccountUI(){
+  const out = document.getElementById('account-logged-out');
+  const inn = document.getElementById('account-logged-in');
+  if(!out || !inn) return;
+  if(accountState){
+    out.style.display = 'none';
+    inn.style.display = 'flex';
+    document.getElementById('acct-email').textContent = accountState.admin ? 'OWNER (master key)' : accountState.email;
+    document.getElementById('acct-plan').textContent = accountState.planName || accountState.plan || 'Free';
+    const quota = accountState.quota === 'unlimited' ? Infinity : accountState.quota;
+    if(quota === Infinity){
+      document.getElementById('acct-usage').textContent = 'unlimited';
+      document.getElementById('acct-usage-fill').style.width = '0%';
+    }else{
+      const pct = quota > 0 ? Math.min(100, Math.round((accountState.usage / quota) * 100)) : 0;
+      document.getElementById('acct-usage').textContent = `${accountState.usage} / ${quota} this month`;
+      const fill = document.getElementById('acct-usage-fill');
+      fill.style.width = pct + '%';
+      fill.style.background = pct >= 90 ? 'var(--red)' : pct >= 70 ? 'var(--amber)' : 'var(--green)';
+    }
+  }else{
+    out.style.display = 'flex';
+    inn.style.display = 'none';
+  }
+}
+
+let authMode = 'login';
+let resetToken = '';
+function openAuthModal(mode){
+  authMode = mode || 'login';
+  updateAuthModalUI();
+  const errEl = document.getElementById('auth-error');
+  if(errEl) errEl.style.display = 'none';
+  const okEl = document.getElementById('auth-success');
+  if(okEl) okEl.style.display = 'none';
+  document.getElementById('auth-modal').classList.add('open');
+  setTimeout(()=>{
+    const focusEl = document.getElementById(authMode === 'reset' ? 'auth-password' : 'auth-email');
+    if(focusEl) focusEl.focus();
+  }, 50);
+}
+function closeAuthModal(e){
+  if(!e || e.target.id === 'auth-modal') document.getElementById('auth-modal').classList.remove('open');
+}
+function switchAuthMode(){
+  if(authMode === 'forgot' || authMode === 'reset'){ authMode = 'login'; }
+  else{ authMode = authMode === 'login' ? 'signup' : 'login'; }
+  const errEl = document.getElementById('auth-error');
+  if(errEl) errEl.style.display = 'none';
+  const okEl = document.getElementById('auth-success');
+  if(okEl) okEl.style.display = 'none';
+  updateAuthModalUI();
+}
+function updateAuthModalUI(){
+  const isSignup = authMode === 'signup';
+  const isForgot = authMode === 'forgot';
+  const isReset = authMode === 'reset';
+  const titles = { signup: 'Create your free account', login: 'Log In', forgot: 'Reset your password', reset: 'Choose a new password' };
+  const submits = { signup: '⚡ CREATE ACCOUNT', login: 'LOG IN', forgot: 'SEND RESET LINK', reset: 'SET NEW PASSWORD' };
+  document.getElementById('auth-modal-title').textContent = titles[authMode] || 'Log In';
+  document.getElementById('auth-submit-btn').textContent = submits[authMode] || 'LOG IN';
+  document.getElementById('auth-switch-btn').textContent =
+    (isForgot || isReset) ? '← Back to log in' : (isSignup ? 'I already have an account' : 'Create account');
+  document.getElementById('auth-email-field').style.display = isReset ? 'none' : 'block';
+  document.getElementById('auth-name-field').style.display = isSignup ? 'block' : 'none';
+  document.getElementById('auth-pass-field').style.display = isForgot ? 'none' : 'block';
+  document.getElementById('auth-pass-label').textContent = isReset ? 'New password' : 'Password';
+  document.getElementById('auth-forgot-row').style.display = authMode === 'login' ? 'block' : 'none';
+  document.getElementById('auth-tos-note').style.display = isSignup ? 'block' : 'none';
+  const hint = document.getElementById('auth-pass-hint');
+  if(hint) hint.style.display = (isSignup || isReset) ? 'inline' : 'none';
+  document.getElementById('auth-password').setAttribute('autocomplete', (isSignup || isReset) ? 'new-password' : 'current-password');
+}
+async function submitAuth(){
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const name = document.getElementById('auth-name') ? document.getElementById('auth-name').value.trim() : '';
+  const errEl = document.getElementById('auth-error');
+  const okEl = document.getElementById('auth-success');
+  const btn = document.getElementById('auth-submit-btn');
+  const fail = (msg) => { errEl.textContent = msg; errEl.style.display = 'block'; okEl.style.display = 'none'; };
+  const win = (msg) => { okEl.textContent = msg; okEl.style.display = 'block'; errEl.style.display = 'none'; };
+  okEl.style.display = 'none';
+
+  if(authMode === 'forgot'){
+    if(!email) return fail('Enter the email you signed up with.');
+    btn.disabled = true;
+    try{
+      const resp = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'forgot', email })
+      });
+      const data = await resp.json().catch(()=>({}));
+      if(!resp.ok) return fail(data.error || 'Something went wrong. Try again.');
+      win('✓ If an account exists for ' + email + ', a reset link is on its way (check spam too — it expires in 1 hour).');
+      document.getElementById('auth-submit-btn').textContent = 'RESEND LINK';
+    }catch(e){
+      fail('Network error: ' + e.message);
+    }finally{
+      btn.disabled = false;
+    }
+    return;
+  }
+
+  if(authMode === 'reset'){
+    if(!password) return fail('Enter a new password.');
+    if(password.length < 8) return fail('Password must be at least 8 characters.');
+    if(!resetToken) return fail('This reset session expired — request a new link below.');
+    btn.disabled = true;
+    try{
+      const resp = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reset', token: resetToken, password })
+      });
+      const data = await resp.json().catch(()=>({}));
+      if(!resp.ok) return fail(data.error || 'Something went wrong. Try again.');
+      resetToken = '';
+      closeAuthModal();
+      document.getElementById('auth-password').value = '';
+      await refreshAccount();
+      alert('✓ Password updated — you are logged in.');
+    }catch(e){
+      fail('Network error: ' + e.message);
+    }finally{
+      btn.disabled = false;
+    }
+    return;
+  }
+
+  if(!email) return fail('Enter your email address.');
+  if(!password) return fail('Enter your password.');
+  if(authMode === 'signup' && password.length < 8) return fail('Password must be at least 8 characters.');
+  btn.disabled = true;
+  try{
+    const resp = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: authMode, email, password, name, utm: (typeof coaiUtm === 'function' ? coaiUtm() : {}) })
+    });
+    const data = await resp.json().catch(()=>({}));
+    if(!resp.ok) return fail(data.error || 'Something went wrong. Try again.');
+    const wasSignup = authMode === 'signup';
+    closeAuthModal();
+    document.getElementById('auth-password').value = '';
+    await refreshAccount();
+    if(wasSignup) maybeShowWelcome();
+  }catch(e){
+    fail('Network error: ' + e.message);
+  }finally{
+    btn.disabled = false;
+  }
+}
+async function doLogout(){
+  try{
+    await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'logout' })
+    });
+  }catch(e){ console.warn(e); }
+  accountState = null;
+  renderAccountUI();
+}
+function openPricingModal(){
+  closeAuthModal();
+  document.getElementById('pricing-modal').classList.add('open');
+}
+function closePricingModal(e){
+  if(!e || e.target.id === 'pricing-modal') document.getElementById('pricing-modal').classList.remove('open');
+}
+async function startCheckout(plan){
+  if(!accountState){ openAuthModal('signup'); return; }
+  try{
+    const resp = await fetch('/api/billing', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'checkout', plan })
+    });
+    const data = await resp.json().catch(()=>({}));
+    if(data.url){ window.location.href = data.url; }
+    else{ alert(data.error || 'Checkout failed — is Stripe configured?'); }
+  }catch(e){ alert('Checkout error: ' + e.message); }
+}
+async function openBillingPortal(){
+  try{
+    const resp = await fetch('/api/billing', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'portal' })
+    });
+    const data = await resp.json().catch(()=>({}));
+    if(data.url){
+      window.location.href = data.url;
+    }else if(data.can_cancel){
+      // Square: no self-serve portal — cancel in-app after confirmation
+      if(confirm((data.message || 'Cancel your subscription?') + '\n\nCancel your COAI subscription now? Your plan stays active until the end of the paid period.')){
+        const cancelResp = await fetch('/api/billing', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'cancel' })
+        });
+        const cancelData = await cancelResp.json().catch(()=>({}));
+        alert(cancelData.message || cancelData.error || 'Done.');
+        refreshAccount();
+      }
+    }else{
+      alert(data.message || data.error || 'Subscribe to a plan first.');
+    }
+  }catch(e){ alert('Billing portal error: ' + e.message); }
+}
+// Check login state on load + handle Stripe checkout return
+document.addEventListener('DOMContentLoaded', () => {
+  refreshAccount();
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('upgraded') === '1'){
+    history.replaceState(null, '', '/app');
+    setTimeout(async () => {
+      await refreshAccount();
+      alert('⚡ Payment complete — your plan is active. Welcome aboard!');
+    }, 2000);
+  }
+  if(params.get('canceled') === '1'){
+    history.replaceState(null, '', '/app');
+  }
+  const resetParam = params.get('reset');
+  if(resetParam){
+    resetToken = resetParam;
+    history.replaceState(null, '', '/app');
+    setTimeout(()=>openAuthModal('reset'), 300);
+  }
+});
+
+// First-run welcome: 3-step checklist shown once after signup
+function maybeShowWelcome(){
+  try{
+    if(localStorage.getItem('coai_welcomed')) return;
+    localStorage.setItem('coai_welcomed', '1');
+  }catch(e){ /* private mode — still show it */ }
+  document.getElementById('welcome-modal').classList.add('open');
+}
+function closeWelcome(e){
+  if(!e || e.target.id === 'welcome-modal') document.getElementById('welcome-modal').classList.remove('open');
+}
+function welcomeGoProfile(){
+  closeWelcome();
+  toggleSettings();
+}
+
+// Nearby Search often omits website + phone; Place Details returns what you see on Maps.
+async function enrichPlaceWithDetails(place){
+  if(!place || !place.place_id) return place;
+  try{
+    const data = await serverFetch({ mode: 'placedetails', place_id: place.place_id });
     if(data.status !== 'OK' || !data.result) return place;
     const r = data.result;
     return {
@@ -1181,12 +1941,12 @@ async function enrichPlaceWithDetails(place, apiKey){
   }
 }
 
-async function enrichPlacesBatch(places, apiKey, onProgress){
+async function enrichPlacesBatch(places, onProgress){
   const chunk = 8;
   const out = [];
   for(let i = 0; i < places.length; i += chunk){
     const slice = places.slice(i, i + chunk);
-    const batch = await Promise.all(slice.map(p => enrichPlaceWithDetails(p, apiKey)));
+    const batch = await Promise.all(slice.map(p => enrichPlaceWithDetails(p)));
     out.push(...batch);
     if(onProgress) onProgress(Math.min(i + chunk, places.length), places.length);
     await sleep(120);
@@ -1198,6 +1958,40 @@ function parseNum(id, fallback){
   const raw = document.getElementById(id)?.value;
   const n = Number(raw);
   return Number.isFinite(n) ? n : fallback;
+}
+
+const SCORE_PRESETS = {
+  default: { noWebsite: 40, lowRating: 25, noRating: 20, lowReviews: 15, noPhone: 10, zeroReviews: 10 },
+  aggressive: { noWebsite: 50, lowRating: 30, noRating: 25, lowReviews: 20, noPhone: 15, zeroReviews: 15 },
+  conservative: { noWebsite: 30, lowRating: 20, noRating: 15, lowReviews: 10, noPhone: 5, zeroReviews: 5 }
+};
+
+function applyScorePreset(name){
+  const p = SCORE_PRESETS[name];
+  if(!p) return;
+  document.getElementById('weight-no-website').value = p.noWebsite;
+  document.getElementById('weight-low-rating').value = p.lowRating;
+  document.getElementById('weight-no-rating').value = p.noRating;
+  document.getElementById('weight-low-reviews').value = p.lowReviews;
+  document.getElementById('weight-no-phone').value = p.noPhone;
+  document.getElementById('weight-zero-reviews').value = p.zeroReviews;
+  // Re-score existing leads
+  const opts = getSearchOptions();
+  allLeads.forEach(lead => {
+    const weights = opts.scoreWeights;
+    let score = 0;
+    if(!lead.hasWebsite) score += weights.noWebsite;
+    if(lead.rating > 0 && lead.rating < 3.5) score += weights.lowRating;
+    if(lead.rating === 0) score += weights.noRating;
+    if(lead.reviews < (opts.lowReviewThreshold || 10)) score += weights.lowReviews;
+    if(!lead.hasPhone) score += weights.noPhone;
+    if(lead.reviews === 0) score += weights.zeroReviews;
+    lead.score = score;
+    lead.priority = score >= 50 ? 'high' : score >= 25 ? 'med' : 'low';
+  });
+  applySortAndRender();
+  updateStats();
+  saveCRMToStorage();
 }
 
 function getSearchOptions(){
@@ -1278,22 +2072,28 @@ function passesSearchOptions(lead, place, opts){
   return true;
 }
 
-// ─── PAGINATED NEARBY SEARCH ───
-async function fetchCategoryLeads(cat, lat, lng, radius, apiKey, maxResults){
+// ─── PAGINATED NEARBY SEARCH — calls our Vercel backend (no client-side API key) ───
+async function fetchCategoryLeads(cat, lat, lng, radius, maxResults){
+  const cacheKey = `${cat}|${lat}|${lng}|${radius}`;
+  if(searchCache.has(cacheKey)){
+    console.log(`[Cache] Found results for ${cat}`);
+    return searchCache.get(cacheKey);
+  }
+
   let results = [];
   let pageToken = null;
   let page = 0;
   const maxPages = maxResults <= 20 ? 1 : maxResults <= 40 ? 2 : 3;
 
   do {
-    let url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&keyword=${encodeURIComponent(cat)}&key=${apiKey}`;
-    if(pageToken) url += `&pagetoken=${encodeURIComponent(pageToken)}`;
+    const params = { lat, lng, radius, type: cat };
+    if(pageToken) params.pagetoken = pageToken;
 
-    const data = await gFetch(url);
+    const data = await serverFetch(params);
 
-    if(data.status === 'REQUEST_DENIED') throw new Error('Places API not enabled or key denied. Check Google Cloud Console.');
+    if(data.status === 'REQUEST_DENIED') throw new Error('Google API key denied or Places API not enabled. Check Vercel env vars.');
     if(data.status === 'OVER_QUERY_LIMIT'){await sleep(2500); break;}
-    if(data.status === 'INVALID_REQUEST' && pageToken){break;} // page token not ready yet
+    if(data.status === 'INVALID_REQUEST' && pageToken){break;}
 
     if(data.results && data.results.length > 0){
       results = results.concat(data.results);
@@ -1307,19 +2107,20 @@ async function fetchCategoryLeads(cat, lat, lng, radius, apiKey, maxResults){
 
   } while(pageToken && page < maxPages && results.length < maxResults);
 
-  return results.slice(0, maxResults);
+  const finalResults = results.slice(0, maxResults);
+  searchCache.set(cacheKey, finalResults);
+  return finalResults;
 }
 
 // ─── MAIN SEARCH ───
 async function runSearch(){
-  const apiKey = document.getElementById('api-key').value.trim();
-  if(!apiKey){
-    alert('Paste your Google Places API key in the sidebar.\n\nGet one free:\n1. console.cloud.google.com\n2. Enable Places API + Geocoding API\n3. Credentials → Create API Key → No restrictions');
-    return;
-  }
+  const adminKey = (document.getElementById('app-password').value || '').trim() || sessionStorage.getItem('coai_auth') || '';
+  if(adminKey){ sessionStorage.setItem('coai_auth', adminKey); }
+  if(!adminKey && !accountState){ openAuthModal('login'); return; }
   if(activeCats.size === 0){alert('Select at least one industry category.');return;}
 
-  const location = document.getElementById('location').value.trim() || 'Bakersfield, CA';
+  const location = document.getElementById('location').value.trim();
+  if(!location){ alert('Enter a city or area first — e.g. "Austin, TX".'); return; }
   const radius = document.getElementById('radius').value;
   const opts = getSearchOptions();
   const resultsCount = opts.resultsCount;
@@ -1350,21 +2151,50 @@ async function runSearch(){
 
     let lat = 35.3733, lng = -119.0187;
     try{
-      const geo = await gFetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=${apiKey}`);
+      // Verify auth first with a ping (also refreshes the usage meter)
+      const ping = await serverFetch({ mode: 'ping' });
+      if(ping.status !== 'authorized') throw new Error('KEY_DENIED');
+      if(ping.email){
+        accountState = Object.assign({}, accountState || {}, {
+          email: ping.email, admin: ping.admin, plan: ping.plan,
+          planName: ping.planName, usage: ping.usage, quota: ping.quota
+        });
+        renderAccountUI();
+      }
+
+      const geo = await serverFetch({ mode: 'geocode', location });
       if(geo.status === 'REQUEST_DENIED') throw new Error('KEY_DENIED');
       if(geo.results && geo.results.length > 0){
         lat = geo.results[0].geometry.location.lat;
         lng = geo.results[0].geometry.location.lng;
+      }else{
+        throw new Error('GEOCODE_EMPTY');
       }
     }catch(geoErr){
-      if(geoErr.message === 'KEY_DENIED'){
+      if(geoErr.quota || geoErr.message.includes('QUOTA_EXCEEDED')){
         document.getElementById('loading-wrap').style.display = 'none';
         document.getElementById('empty-state').style.display = 'flex';
         document.getElementById('search-btn').disabled = false;
-        alert('API KEY DENIED.\n\n1. Places API enabled?\n2. Geocoding API enabled?\n3. Application Restrictions → NONE\n4. API Restrictions → Don\'t restrict\n5. Wait 5 min then try again');
+        openPricingModal();
         return;
       }
-      console.warn('Geocode failed, using Bakersfield default:', geoErr.message);
+      if(geoErr.auth || geoErr.message.includes('LOGIN_REQUIRED') || geoErr.message === 'KEY_DENIED' || geoErr.message.includes('Unauthorized') || geoErr.message.includes('401')){
+        document.getElementById('loading-wrap').style.display = 'none';
+        document.getElementById('empty-state').style.display = 'flex';
+        document.getElementById('search-btn').disabled = false;
+        if(!accountState && !adminKey){
+          openAuthModal('login');
+        }else{
+          alert('ACCESS DENIED.\n\nYour session may have expired — log out and log back in, or enter the owner key in the sidebar.');
+        }
+        return;
+      }
+      // Never silently scan somewhere the user didn't ask for.
+      document.getElementById('loading-wrap').style.display = 'none';
+      document.getElementById('empty-state').style.display = 'flex';
+      document.getElementById('search-btn').disabled = false;
+      alert('Could not find "' + location + '". Check the spelling and try "City, State" format.');
+      return;
     }
 
     const cats = Array.from(activeCats);
@@ -1378,13 +2208,20 @@ async function runSearch(){
       document.getElementById('loading-sub').textContent = `${allLeads.length} leads found so far...`;
 
       try{
-        const places = await fetchCategoryLeads(cat, lat, lng, radius, apiKey, resultsCount);
-        let placesForCat = places;
-        if(!opts.skipPlaceDetails && places.length){
-          document.getElementById('loading-text').textContent = 'LOADING LISTING DETAILS...';
-          placesForCat = await enrichPlacesBatch(places, apiKey, (done, total) => {
-            document.getElementById('loading-sub').textContent = `Place Details ${done}/${total} · ${cat}`;
-          });
+        const cached = searchCache.get(`${cat}|${lat}|${lng}|${radius}`);
+        let placesForCat = cached || await fetchCategoryLeads(cat, lat, lng, radius, resultsCount);
+        
+        if(!opts.skipPlaceDetails && placesForCat.length){
+          // Avoid re-enriching if we already have detailed data
+          const needsDetails = placesForCat.filter(p => !p.website && !p.formatted_phone_number);
+          if(needsDetails.length > 0){
+            document.getElementById('loading-text').textContent = 'LOADING LISTING DETAILS...';
+            placesForCat = await enrichPlacesBatch(placesForCat, (done, total) => {
+              document.getElementById('loading-sub').textContent = `Place Details ${done}/${total} · ${cat}`;
+            });
+            // Update cache with detailed places
+            searchCache.set(`${cat}|${lat}|${lng}|${radius}`, placesForCat);
+          }
         }
         placesForCat.forEach(place => {
           const lead = buildLead(place, cat, opts);
@@ -1395,6 +2232,23 @@ async function runSearch(){
             const key = buildBizKey(lead);
             if(seenBizKeys.has(key)) return;
             seenBizKeys.add(key);
+          }
+          // Phone dedup — skip if same phone number exists in current results or stored leads
+          if(lead.phone){
+            const phoneClean = lead.phone.replace(/\D/g, '');
+            if(phoneClean && phoneClean.length >= 7){
+              const phoneDup = allLeads.find(l => {
+                const lp = displayPhone(l).replace(/\D/g, '');
+                return lp && lp === phoneClean;
+              });
+              if(phoneDup){
+                // Merge enriched data from duplicate (e.g., website from rescan)
+                if(lead.website && !phoneDup.website){ phoneDup.website = lead.website; phoneDup.hasWebsite = true; }
+                if(lead.name && phoneDup.name !== lead.name) phoneDup.name = lead.name;
+                seenBizKeys.add(buildBizKey(lead));
+                return;
+              }
+            }
           }
           allLeads.push(lead);
           existingIds.add(place.place_id);
@@ -1432,11 +2286,19 @@ async function runSearch(){
 
     // Auto-enrich all leads with websites in background
     if(opts.enrichAfterScan) enrichAllLeads();
+    refreshAccount(); // usage meter changed — show fresh numbers
 
   }catch(err){
     document.getElementById('loading-wrap').style.display = 'none';
     document.getElementById('empty-state').style.display = 'flex';
-    alert('Error: ' + err.message);
+    if(err.quota || String(err.message).includes('QUOTA_EXCEEDED')){
+      refreshAccount();
+      openPricingModal();
+    }else if(err.auth || String(err.message).includes('LOGIN_REQUIRED')){
+      openAuthModal('login');
+    }else{
+      alert('Error: ' + err.message);
+    }
   }
   document.getElementById('search-btn').disabled = false;
 }
@@ -1493,7 +2355,9 @@ function buildLead(place, cat, opts){
     note: '',
     enrichedPhone: null,
     enrichedEmail: null,
-    enriched: false
+    enriched: false,
+    pipelineStage: 'new',
+    scanDate: new Date().toISOString()
   };
 }
 
@@ -1505,6 +2369,8 @@ function renderLeads(leads){
     container.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--muted);font-size:13px;">No leads match this filter.</div>';
     return;
   }
+  const frag = document.createDocumentFragment();
+  const now = Date.now();
   leads.forEach(lead => {
     const card = document.createElement('div');
     card.className = `lead-card priority-${lead.priority}${contacted.has(lead.id)?' contacted':''}${closed.has(lead.id)?' closed':''}`;
@@ -1514,18 +2380,33 @@ function renderLeads(leads){
     const scoreLabel = lead.score >= 50 ? '🔥 HOT' : lead.score >= 25 ? 'WARM' : 'COLD';
     const phoneDisp = displayPhone(lead);
     const idEnc = idForDomAttr(lead.id);
+    const isStale = lead.scanDate && (now - new Date(lead.scanDate).getTime()) > 30 * 24 * 60 * 60 * 1000;
+    const scanAgo = lead.scanDate ? (() => {
+      const days = Math.floor((now - new Date(lead.scanDate).getTime()) / 86400000);
+      return days === 0 ? 'today' : days === 1 ? '1d ago' : days + 'd ago';
+    })() : '';
 
     card.innerHTML = `
       <div class="lead-top">
-        <div class="lead-name">${escapeHtml(lead.name)}</div>
-        <div class="lead-score ${scoreClass}">${scoreLabel} · ${lead.score}</div>
-      </div>
-      <div class="lead-meta">
-        <span class="lead-cat-tag">${escapeHtml(String(lead.cat).toUpperCase())}</span>
-        <span class="lead-address">${escapeHtml(lead.address)}</span>
+        <div class="lead-name-group" style="display:flex;align-items:flex-start;gap:10px;">
+          <input type="checkbox" class="lead-checkbox" data-id="${idEnc}" onchange="onBulkCheckChange(this)" style="accent-color:var(--green);margin-top:4px;flex-shrink:0;" aria-label="Select ${escapeHtml(lead.name)}"/>
+          <div>
+            <div class="lead-name">${escapeHtml(lead.name)}</div>
+            <div class="lead-meta">
+              <span class="lead-cat-tag">${escapeHtml(String(lead.cat).toUpperCase())}</span>
+              <span class="lead-address">${escapeHtml(lead.address)}</span>
+            </div>
+          </div>
+        </div>
+        <div class="lead-score-hero ${scoreClass}">
+          <div class="lsh-val">${lead.score}</div>
+          <div class="lsh-lbl">${scoreLabel}</div>
+        </div>
       </div>
       <div class="lead-signals">
         ${lead.signals.map(s=>`<span class="signal-tag sig-${s.type}">${escapeHtml(s.label)}</span>`).join('')}
+        ${lead.enriched && (lead.enrichedPhone || lead.enrichedEmail) ? `<span class="signal-tag sig-ok">✓ Contact Enriched</span>` : (lead.enriched ? `<span class="signal-tag sig-warn">○ Partial Enrich</span>` : (lead.hasWebsite ? `<span class="signal-tag" style="background:rgba(255,255,255,0.03);color:var(--muted);border:1px solid var(--border);">Pending Enrich</span>` : ''))}
+        ${isStale ? `<span class="signal-tag" style="background:rgba(255,184,0,0.08);color:var(--amber);border:1px solid rgba(255,184,0,0.2);">⚠ Stale ${scanAgo}</span>` : (scanAgo ? `<span class="signal-tag" style="background:rgba(255,255,255,0.03);color:var(--muted);border:1px solid var(--border);">Scanned ${scanAgo}</span>` : '')}
       </div>
       <div class="lead-actions">
         <button class="action-btn" type="button" onclick="openMapsById(decodeURIComponent('${idEnc}'))">Maps</button>
@@ -1542,8 +2423,9 @@ function renderLeads(leads){
         <textarea placeholder="Add a note..." onchange="saveNote(decodeURIComponent('${idEnc}'),this.value)">${escapeHtml(lead.note||'')}</textarea>
       </div>
     `;
-    container.appendChild(card);
+    frag.appendChild(card);
   });
+  container.appendChild(frag);
 }
 
 // ─── SORT ───
@@ -1572,7 +2454,7 @@ function updateStats(){
   const lowrated = allLeads.filter(l=>l.rating>0&&l.rating<4).length;
   document.getElementById('st-found').textContent = allLeads.length;
   document.getElementById('st-nosite').textContent = nosite;
-  document.getElementById('st-lowrated').textContent = lowrated;
+  document.getElementById('st-hot-stats').textContent = hot;
   document.getElementById('st-cats').textContent = scannedCatCount;
   document.getElementById('s-total').textContent = allLeads.length;
   document.getElementById('s-hot').textContent = hot;
@@ -1581,9 +2463,125 @@ function updateStats(){
 
 function updateExportInfo(){
   document.getElementById('export-info').textContent = `${allLeads.length} leads · ${contacted.size} contacted · ${closed.size} closed`;
+  updateWebhookRetryBadge();
 }
 
 // ─── ACTIONS ───
+function openWebhookModal(){
+  const savedUrl = localStorage.getItem('coai_webhook_url') || '';
+  document.getElementById('webhook-url').value = savedUrl;
+  document.getElementById('webhook-modal').classList.add('open');
+  document.getElementById('webhook-status').textContent = '';
+}
+
+function closeWebhookModal(e){
+  if(!e || e.target === document.getElementById('webhook-modal') || e.target.classList.contains('close-btn')){
+    document.getElementById('webhook-modal').classList.remove('open');
+  }
+}
+
+const WEBHOOK_RETRY_LS_KEY = 'coai_webhook_retry_v1';
+
+function getWebhookRetries(){
+  try{ const r = localStorage.getItem(WEBHOOK_RETRY_LS_KEY); return r ? JSON.parse(r) : []; }catch{ return []; }
+}
+
+function saveWebhookRetries(retries){
+  try{ localStorage.setItem(WEBHOOK_RETRY_LS_KEY, JSON.stringify(retries)); }catch{}
+}
+
+function updateWebhookRetryBadge(){
+  const retries = getWebhookRetries();
+  const existing = document.getElementById('wh-retry-badge');
+  if(existing) existing.remove();
+  if(retries.length === 0) return;
+  const badge = document.createElement('span');
+  badge.id = 'wh-retry-badge';
+  badge.style.cssText = 'font-family:var(--mono);font-size:9px;color:var(--red);background:rgba(255,59,48,0.1);border:1px solid rgba(255,59,48,0.25);padding:2px 8px;border-radius:100px;cursor:pointer;';
+  badge.textContent = `⚠ ${retries.length} webhook retries`;
+  badge.onclick = retryFailedWebhooks;
+  const bar = document.querySelector('.export-bar');
+  if(bar) bar.appendChild(badge);
+}
+
+async function retryFailedWebhooks(){
+  const retries = getWebhookRetries();
+  if(retries.length === 0){ alert('No failed webhooks to retry.'); return; }
+  const entry = retries[0];
+  const { url, segment, leads } = entry;
+  if(!url){ retries.shift(); saveWebhookRetries(retries); updateWebhookRetryBadge(); return; }
+  try{
+    const resp = await fetch(url, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, mode: 'no-cors',
+      body: JSON.stringify({
+        source: 'COAI Lead Engine v2 (retry)',
+        timestamp: new Date().toISOString(),
+        leads
+      })
+    });
+    retries.shift();
+    saveWebhookRetries(retries);
+    updateWebhookRetryBadge();
+    alert(`✓ Retry successful! ${leads.length} leads sent. ${retries.length > 0 ? `${retries.length} remaining.` : 'All cleared.'}`);
+  }catch(e){
+    alert('Retry failed: ' + e.message);
+  }
+}
+
+async function pushToWebhook(){
+  const url = document.getElementById('webhook-url').value.trim();
+  if(!url){alert('Please enter a Webhook URL.');return;}
+  localStorage.setItem('coai_webhook_url', url);
+  
+  const segment = document.getElementById('webhook-segment').value;
+  let targetLeads = allLeads;
+  if(segment === 'hot') targetLeads = allLeads.filter(l => l.score >= 50);
+  if(segment === 'new') targetLeads = allLeads.filter(l => !contacted.has(l.id));
+
+  if(targetLeads.length === 0){
+    alert('No leads found for the selected segment.');
+    return;
+  }
+
+  const btn = document.getElementById('webhook-push-btn');
+  const status = document.getElementById('webhook-status');
+  btn.disabled = true;
+  btn.textContent = '🚀 PUSHING...';
+  status.textContent = `Sending ${targetLeads.length} leads to your CRM...`;
+
+  try {
+    // We send them in one big POST. Zapier/Make "Catch Webhook" usually handles this as a single trigger if configured for it, 
+    // or we could loop. Typically, single POST with array is better for bulk.
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      mode: 'no-cors', // Many webhooks don't have CORS, no-cors lets us fire and forget
+      body: JSON.stringify({
+        source: 'COAI Lead Engine v2',
+        timestamp: new Date().toISOString(),
+        leads: targetLeads
+      })
+    });
+    
+    // With no-cors we can't see the response but it usually succeeds
+    status.textContent = `✓ ${targetLeads.length} leads sent successfully!`;
+    btn.textContent = '✓ SENT';
+    setTimeout(() => {
+      btn.textContent = '🚀 PUSH TO WEBHOOK';
+      btn.disabled = false;
+    }, 3000);
+  } catch (err) {
+    status.textContent = '✖ Error: ' + err.message + ' — saved for retry';
+    btn.disabled = false;
+    btn.textContent = '🚀 RETRY PUSH';
+    // Save to retry queue
+    const retries = getWebhookRetries();
+    retries.push({ url, segment, leads: targetLeads, failedAt: new Date().toISOString() });
+    saveWebhookRetries(retries);
+    updateWebhookRetryBadge();
+  }
+}
+
 function openMaps(url){window.open(url,'_blank');}
 function callLead(phone){window.location.href='tel:'+phone.replace(/\D/g,'');}
 
@@ -1679,34 +2677,45 @@ function setMsgType(type, btn){
 
 function generateMsg(lead, type){
   if(!lead) return '';
+  const s = appSettings;
   const noSite = !lead.hasWebsite;
   const lowRating = lead.rating > 0 && lead.rating < 3.5;
   const noRating = lead.rating === 0;
   const pain = noSite ? 'no website showing up on Google' : lowRating ? `a ${lead.rating}-star rating online` : noRating ? 'no reviews or ratings yet on Google' : 'a digital presence that could use some work';
+  const tone = s.tone || 'casual';
+  const location = (s.address || '').split(',').pop()?.trim() || 'your area';
+  const bizShort = s.businessName || 'our agency';
+
+  const priceBit = s.price ? ` starting at ${s.price}` : '';
+  const greeting = {
+    casual: `Hey, I noticed ${lead.name} has ${pain}. I'm ${s.ownerName || 'a local consultant'} with ${s.businessName || 'my agency'} here in ${location} — we build websites and AI systems for local businesses like yours${s.price ? `, starting at ${s.price}` : ''}. You own everything outright, no monthly platform fees. Would you be open to a free 10-minute audit call? ${s.phone || ''}`,
+    professional: `Hello, I came across ${lead.name} while researching ${lead.cat} businesses in ${location} and noticed ${pain}. My name is ${s.ownerName || 'a business consultant'} with ${s.businessName || 'a local agency'}. We specialize in helping businesses like yours improve their online presence${s.price ? ` — packages starting at ${s.price} —` : ''} with full ownership and no recurring platform fees.\n\nI'd love to schedule a brief 15-minute consultation to discuss how we can help you capture more leads. Please feel free to reach out at ${s.phone || 'the number above'}.\n\nBest regards,\n${s.ownerName || 'Team'}\n${s.businessName || ''}`,
+    direct: `${lead.name} has ${pain}. That's costing you leads every day. ${s.ownerName || 'We'} with ${s.businessName || 'our agency'} fix this. We build websites and AI systems${priceBit} — you own it, no monthly fees. Want a free 10-minute audit to see exactly what you're missing? ${s.phone || 'Reply to this message'}`
+  };
 
   if(type === 'text'){
-    return `Hey, I noticed ${lead.name} has ${pain}. I'm Jason with Chaotically Organized AI here in Bakersfield — we build websites and AI systems for local businesses like yours starting at $1,200, and you own everything outright. No monthly fees. Would you be open to a free 10-minute audit call? (661) 610-9198`;
+    return greeting[tone] || greeting.casual;
   }
   if(type === 'email'){
     return `Subject: Your Google listing for ${lead.name} — quick question
 
 Hi there,
 
-I was searching for ${lead.cat} businesses in Bakersfield and noticed ${lead.name} has ${pain}.
+I was searching for ${lead.cat} businesses in ${location} and noticed ${lead.name} has ${pain}.
 
-I'm Jason Manuel, founder of Chaotically Organized AI (chaoticallyorganizedai.com). We build sovereign websites and AI lead capture systems for local service businesses — starting at $1,200 with full ownership and zero monthly platform fees.
+I'm ${s.ownerName || 'a local consultant'}, ${tone === 'professional' ? 'representing' : 'founder of'} ${s.businessName || 'a local agency'}${s.website ? ` (${s.website})` : ''}. We build websites and AI lead capture systems for local service businesses${s.price ? ` — starting at ${s.price}` : ''} with full ownership and zero monthly platform fees.
 
 I'd love to do a free 15-minute audit of your current online presence and show you exactly what it's costing you in missed leads.
 
 Worth a quick call?
 
-— Jason
-(661) 610-9198
-chaoticallyorganizedai.com
-1712 19th St #216, Bakersfield CA`;
+${tone === 'professional' ? 'Best regards' : '—'} ${s.ownerName || 'Team'}
+${s.phone || ''}
+${s.website || ''}
+${s.address || ''}`;
   }
   if(type === 'voicemail'){
-    return `Hey, this is Jason Manuel calling for ${lead.name}. I run Chaotically Organized AI here in Bakersfield — we help local businesses fix their online presence so they stop losing leads to competitors. I noticed ${pain} on your Google listing and wanted to offer a free audit — takes about 15 minutes and I'll show you exactly what it's costing you. Give me a call back at 661-610-9198. That's 661-610-9198. Thanks — talk soon.`;
+    return `Hey, this is ${s.ownerName || 'your rep'} calling for ${lead.name}. I run ${s.businessName || 'an agency'} here in ${location} — we help local businesses fix their online presence so they stop losing leads to competitors. I noticed ${pain} on your Google listing and wanted to offer a free audit — takes about 15 minutes and I'll show you exactly what it's costing you. Give me a call back at ${s.phone || 'the number I just dialed'}. Thanks — talk soon.`;
   }
   return '';
 }
@@ -1726,10 +2735,351 @@ function closeModal(e){
   }
 }
 
+// ─── AI OUTREACH GENERATOR ───
+function generateOpportunityReport(){
+  const lead = activeLead;
+  if(!lead) return;
+  // Lazy-load jsPDF on first use
+  if(!window.jspdf){
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload = generateOpportunityReport;
+    document.body.appendChild(s);
+    return;
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  const primaryColor = [10, 10, 10];
+  const accentColor = [0, 255, 136]; // Green
+  const warnColor = [255, 184, 0];   // Amber
+  const dangerColor = [255, 59, 48];  // Red
+
+  // Header
+  doc.setFillColor(...primaryColor);
+  doc.rect(0, 0, 210, 40, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.text("BUSINESS OPPORTUNITY REPORT", 15, 25);
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Prepared for: ${lead.name}`, 15, 32);
+  doc.text(`Date: ${new Date().toLocaleDateString()}`, 160, 32);
+
+  // Business Info
+  doc.setTextColor(...primaryColor);
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("Business Overview", 15, 55);
+  doc.setDrawColor(200, 200, 200);
+  doc.line(15, 58, 195, 58);
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Category: ${lead.cat.toUpperCase()}`, 15, 68);
+  doc.text(`Address: ${lead.address}`, 15, 75);
+  doc.text(`Google Rating: ${lead.rating ? lead.rating + ' stars' : 'None'}`, 15, 82);
+  doc.text(`Total Reviews: ${lead.reviews}`, 15, 89);
+  doc.text(`Website: ${lead.hasWebsite ? lead.website : 'NOT FOUND'}`, 15, 96);
+
+  // Opportunity Score Hero
+  doc.setFillColor(245, 245, 245);
+  doc.roundedRect(140, 60, 55, 40, 3, 3, 'F');
+  doc.setTextColor(...primaryColor);
+  doc.setFontSize(10);
+  doc.text("OPPORTUNITY SCORE", 145, 70);
+  doc.setFontSize(32);
+  doc.setFont("helvetica", "bold");
+  const scoreColor = lead.score >= 50 ? dangerColor : lead.score >= 25 ? warnColor : primaryColor;
+  doc.setTextColor(...scoreColor);
+  doc.text(`${lead.score}`, 145, 88);
+
+  // Vulnerability Analysis
+  doc.setTextColor(...primaryColor);
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("Vulnerability Analysis & Pain Points", 15, 115);
+  doc.line(15, 118, 195, 118);
+
+  let y = 130;
+  lead.signals.forEach(sig => {
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    if(sig.type === 'bad') doc.setTextColor(...dangerColor);
+    else if(sig.type === 'warn') doc.setTextColor(...warnColor);
+    else doc.setTextColor(...accentColor);
+    
+    doc.text(`[!] ${sig.label}`, 15, y);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(80, 80, 80);
+    
+    let advice = "";
+    if(sig.label === 'No Website') advice = "Your business is invisible to customers searching on mobile. A professional landing page could increase leads by 40%.";
+    else if(sig.label === '0 Reviews') advice = "Zero social proof makes potential customers trust your competitors more. An automated review system is required.";
+    else if(sig.label === 'No Phone') advice = "Customers cannot contact you directly from Google. This is a critical friction point.";
+    else if(sig.type === 'bad' && sig.label.includes('★')) advice = "Your current rating is below the local average. Negative sentiment is actively driving away revenue.";
+    else advice = "This area of your digital presence is underperforming compared to top competitors in your area.";
+
+    const splitAdvice = doc.splitTextToSize(advice, 170);
+    doc.text(splitAdvice, 15, y + 6);
+    y += 22;
+  });
+
+  // Solutions
+  doc.setFillColor(...accentColor);
+  doc.rect(15, 240, 180, 40, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("Recommended Action Plan", 25, 252);
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text("1. Immediate deployment of an AI-powered Lead Capture Page.", 25, 260);
+  doc.text("2. Integration of Google Business Profile optimization & Review Growth.", 25, 266);
+  doc.text("3. Setup of 24/7 AI Receptionist to handle missed calls.", 25, 272);
+
+  doc.save(`COAI-Audit-${lead.name.replace(/[^a-z0-9]/gi, '_')}.pdf`);
+}
+
+async function generateAIOutreach(){
+  if(!activeLead) return;
+  const btn = document.getElementById('ai-gen-btn');
+  const preview = document.getElementById('msg-preview');
+  const authKey = sessionStorage.getItem('coai_auth') || '';
+  // Auth works two ways: owner key header OR logged-in session cookie
+  // (same-origin fetch sends the cookie automatically).
+  if(!authKey && !accountState){ openAuthModal('login'); return; }
+  btn.textContent = '⚡ Generating…';
+  btn.disabled = true;
+  try{
+    const resp = await fetch('/api/outreach', {
+      method: 'POST',
+      headers: {
+        'Authorization': authKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        lead: {
+          name: activeLead.name, cat: activeLead.cat, address: activeLead.address,
+          rating: activeLead.rating, reviews: activeLead.reviews,
+          hasWebsite: activeLead.hasWebsite, hasPhone: activeLead.hasPhone
+        },
+        type: msgType,
+        provider: appSettings.aiProvider || 'gemini',
+        sender: {
+          businessName: appSettings.businessName, ownerName: appSettings.ownerName,
+          phone: appSettings.phone, email: appSettings.email,
+          address: appSettings.address, website: appSettings.website,
+          price: appSettings.price, tone: appSettings.tone
+        }
+      }),
+      signal: AbortSignal.timeout(20000)
+    });
+    if(resp.status === 401){ openAuthModal('login'); btn.textContent = '⚡ AI Personalize'; btn.disabled = false; return; }
+    if(resp.status === 402){
+      // Out of monthly calls: show the plans instead of failing silently
+      btn.textContent = '⚡ AI Personalize'; btn.disabled = false;
+      refreshAccount(); openPricingModal();
+      return;
+    }
+    const data = await resp.json();
+    if(data.fallback){
+      // No AI key configured or call failed — use static template silently
+      console.info('AI outreach fallback:', data.reason);
+    } else if(data.message){
+      preview.textContent = data.message;
+      btn.textContent = '✓ AI Done';
+      setTimeout(()=>{btn.textContent='⚡ AI Personalize';btn.disabled=false;},2000);
+      return;
+    }
+  }catch(e){
+    console.warn('AI outreach failed:', e.message);
+  }
+  btn.textContent = '⚡ AI Personalize';
+  btn.disabled = false;
+}
+
+// ─── PIPELINE KANBAN ───
+const PIPELINE_COLS = [
+  { key: 'new', label: 'New', color: '#666' },
+  { key: 'contacted', label: 'Contacted', color: '#ffb800' },
+  { key: 'interested', label: 'Interested', color: '#3b9eff' },
+  { key: 'proposal', label: 'Proposal Sent', color: '#a78bfa' },
+  { key: 'won', label: 'Closed Won', color: '#00ff88' },
+  { key: 'lost', label: 'Closed Lost', color: '#ff3b30' }
+];
+
+function getPipelineStage(lead){
+  if(lead.pipelineStage && PIPELINE_COLS.some(c => c.key === lead.pipelineStage)) return lead.pipelineStage;
+  if(closed.has(lead.id)) return 'won';
+  if(contacted.has(lead.id)) return 'contacted';
+  return 'new';
+}
+
+function movePipelineStage(id, newStage){
+  const lead = allLeads.find(l => l.id === id);
+  if(!lead) return;
+  lead.pipelineStage = newStage;
+  if(newStage === 'won' || newStage === 'lost'){
+    closed.add(id); contacted.add(id);
+  }else if(newStage === 'contacted' || newStage === 'interested' || newStage === 'proposal'){
+    contacted.add(id); closed.delete(id);
+  }else{
+    contacted.delete(id); closed.delete(id);
+  }
+  saveCRMToStorage();
+  renderPipeline();
+  applySortAndRender();
+  updateStats();
+  updateExportInfo();
+  document.getElementById('s-contacted').textContent = contacted.size;
+  document.getElementById('s-closed').textContent = closed.size;
+}
+
+function repopulatePipelineCategorySelect(){
+  const sel = document.getElementById('pipeline-filter-cat');
+  if(!sel) return;
+  const prev = sel.value;
+  const cats = [...new Set(allLeads.map(l => l.cat).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  sel.innerHTML = '<option value="">All categories</option>';
+  cats.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c;
+    if(c === prev) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+
+function renderPipeline(){
+  const board = document.getElementById('pipeline-board');
+  if(!board) return;
+  const catFilter = document.getElementById('pipeline-filter-cat')?.value || '';
+  const minScore = parseInt(document.getElementById('pipeline-min-score')?.value || '0', 10) || 0;
+
+  let filtered = [...allLeads];
+  if(catFilter) filtered = filtered.filter(l => l.cat === catFilter);
+  if(minScore > 0) filtered = filtered.filter(l => l.score >= minScore);
+
+  // Assign each lead to a pipeline column
+  const cols = {};
+  PIPELINE_COLS.forEach(c => cols[c.key] = []);
+  filtered.forEach(lead => {
+    const stage = getPipelineStage(lead);
+    if(cols[stage]) cols[stage].push(lead);
+    else cols['new'].push(lead);
+  });
+
+  // Sort each column by score descending
+  Object.values(cols).forEach(arr => arr.sort((a,b) => b.score - a.score));
+
+  let html = '';
+  PIPELINE_COLS.forEach(col => {
+    const leadsInCol = cols[col.key] || [];
+    html += `<div class="pipeline-col">
+      <div class="pipeline-col-header" style="border-left:3px solid ${col.color};">
+        <span>${col.label}</span>
+        <span class="pipeline-col-count">${leadsInCol.length}</span>
+      </div>
+      <div class="pipeline-col-body">
+        ${leadsInCol.length === 0 ? '<div class="pipeline-col-empty">Drop leads here</div>' : leadsInCol.map(lead => {
+          const idEnc = idForDomAttr(lead.id);
+          const stage = getPipelineStage(lead);
+          const stageIdx = PIPELINE_COLS.findIndex(c => c.key === stage);
+          const nextStage = stageIdx < PIPELINE_COLS.length - 1 ? PIPELINE_COLS[stageIdx + 1] : null;
+          const prevStage = stageIdx > 0 ? PIPELINE_COLS[stageIdx - 1] : null;
+          const scoreCls = lead.score >= 50 ? 'sig-bad' : lead.score >= 25 ? 'sig-warn' : '';
+          return `<div class="pipeline-card" onclick="openOutreach(decodeURIComponent('${idEnc}'))" title="Click to generate outreach">
+            <div class="pc-name">${escapeHtml(lead.name)}</div>
+            <div class="pc-meta">
+              <span class="pc-tag">${escapeHtml(lead.cat)}</span>
+              <span class="pc-score ${scoreCls}" style="font-size:11px;">${lead.score}pts</span>
+              ${lead.rating > 0 ? `<span class="pc-tag">${lead.rating}★</span>` : ''}
+            </div>
+            <div class="pc-actions">
+              ${prevStage ? `<button type="button" onclick="event.stopPropagation();movePipelineStage(decodeURIComponent('${idEnc}'),'${prevStage.key}')">◀ ${prevStage.label}</button>` : ''}
+              ${nextStage ? `<button type="button" onclick="event.stopPropagation();movePipelineStage(decodeURIComponent('${idEnc}'),'${nextStage.key}')">${nextStage.label} ▶</button>` : ''}
+              <button type="button" onclick="event.stopPropagation();openMapsById(decodeURIComponent('${idEnc}'))">Maps</button>
+              <button type="button" onclick="event.stopPropagation();deleteLead(decodeURIComponent('${idEnc}'))">Del</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  });
+
+  board.innerHTML = html;
+}
+
+// ─── CRM BACKUP / RESTORE ───
+function exportCRMBackup(){
+  const payload = {
+    v: 1,
+    exportDate: new Date().toISOString(),
+    leads: allLeads,
+    contactedIds: [...contacted],
+    closedIds: [...closed],
+    scannedCatCount
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `coai-crm-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importCRMBackup(){
+  document.getElementById('crm-import-file').click();
+}
+
+function handleCRMImportFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const data = JSON.parse(e.target.result);
+      if(!data || !Array.isArray(data.leads)){
+        alert('Invalid backup file — expected COAI CRM JSON format.');
+        return;
+      }
+      if(!confirm(`Restore ${data.leads.length} leads from backup dated ${(data.exportDate||'unknown').slice(0,10)}?\nThis will REPLACE your current CRM.`)) return;
+      allLeads = data.leads;
+      contacted = new Set(data.contactedIds || []);
+      closed = new Set(data.closedIds || []);
+      scannedCatCount = typeof data.scannedCatCount === 'number' ? data.scannedCatCount : new Set(allLeads.map(l=>l.cat)).size;
+      saveCRMToStorage();
+      updateMainChromeVisibility();
+      document.getElementById('empty-state').style.display = allLeads.length ? 'none' : 'flex';
+      if(allLeads.length){
+        document.getElementById('stats-row').style.display = 'grid';
+        document.getElementById('filter-row').style.display = 'flex';
+        document.getElementById('sort-row').style.display = 'flex';
+        document.getElementById('export-bar').style.display = 'flex';
+        setMainMode('prospector');
+        updateStats();
+        updateExportInfo();
+        document.getElementById('s-contacted').textContent = contacted.size;
+        document.getElementById('s-closed').textContent = closed.size;
+      }
+      alert(`✓ Restored ${allLeads.length} leads successfully.`);
+    }catch(err){
+      alert('Failed to parse backup file: ' + err.message);
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
 // ─── CONTACT ENRICHMENT ───
 async function enrichAllLeads(){
-  const authKey = sessionStorage.getItem('coai_auth');
-  if(!authKey) return;
+  // Logged-in customers authenticate via session cookie (same-origin fetch
+  // sends it automatically); the owner key header is only a fallback.
+  const authKey = sessionStorage.getItem('coai_auth') || '';
+  if(!authKey && !accountState){ openAuthModal('login'); return; }
 
   const leadsWithSites = allLeads.filter(l => l.hasWebsite && !l.enriched);
   if(leadsWithSites.length === 0) return;
@@ -1739,15 +3089,18 @@ async function enrichAllLeads(){
     `${allLeads.length} leads · enriching contact data... (0/${leadsWithSites.length})`;
 
   let done = 0;
+  let stopReason = null; // 'quota' or 'auth' stops the run
   // Run in batches of 5 concurrent to stay fast but not hammer servers
-  for(let i = 0; i < leadsWithSites.length; i += 5){
+  for(let i = 0; i < leadsWithSites.length && !stopReason; i += 5){
     const batch = leadsWithSites.slice(i, i + 5);
     await Promise.all(batch.map(async lead => {
       try{
         const resp = await fetch(
-          '/api/enrich?url=' + encodeURIComponent(lead.website),
-          { headers: { 'Authorization': authKey }, signal: AbortSignal.timeout(10000) }
+          '/api/scrape?url=' + encodeURIComponent(lead.website),
+          { headers: { 'Authorization': authKey }, signal: AbortSignal.timeout(15000) }
         );
+        if(resp.status === 402){ stopReason = 'quota'; return; }
+        if(resp.status === 401){ stopReason = 'auth'; return; }
         if(resp.ok){
           const data = await resp.json();
           lead.enrichedPhone = data.phone || null;
@@ -1768,6 +3121,9 @@ async function enrichAllLeads(){
   updateExportInfo();
   saveCRMToStorage();
   refreshCRMIfActive();
+  if(accountState) refreshAccount(); // usage changed
+  if(stopReason === 'quota') openPricingModal();
+  if(stopReason === 'auth') openAuthModal('login');
 }
 
 function updateLeadCard(lead){
@@ -1823,14 +3179,15 @@ function updateLeadCard(lead){
 // ─── EXPORT CSV (all) ───
 function exportCSV(){
   if(allLeads.length === 0){alert('No leads to export.');return;}
-  const headers = ['Name','Category','Address','Phone (Google)','Phone (Enriched)','Email','Has Website','Website','Rating','Reviews','Score','Priority','Status','Note'];
+  const headers = ['Name','Category','Address','Phone (Google)','Phone (Enriched)','Email','Has Website','Website','Rating','Reviews','Score','Priority','Status','Note','Scan Date'];
   const rows = allLeads.map(l=>[
-    `"${l.name.replace(/"/g,'""')}"`, `"${l.cat}"`, `"${l.address}"`,
+    l.name, l.cat, l.address,
     l.phone||'', l.enrichedPhone||'', l.enrichedEmail||'',
     l.hasWebsite?'Yes':'No', l.website||'',
     l.rating||'', l.reviews||'', l.score, l.priority,
     closed.has(l.id)?'Closed':contacted.has(l.id)?'Contacted':'New',
-    `"${(l.note||'').replace(/"/g,'""')}"`
+    l.note||'',
+    l.scanDate ? l.scanDate.slice(0,10) : ''
   ]);
   downloadCSV([headers,...rows], `coai-leads-${new Date().toISOString().slice(0,10)}.csv`);
 }
@@ -1841,15 +3198,23 @@ function exportHotCSV(){
   if(hot.length === 0){alert('No hot leads to export.');return;}
   const headers = ['Name','Category','Address','Phone (Google)','Phone (Enriched)','Email','Has Website','Rating','Reviews','Score'];
   const rows = hot.map(l=>[
-    `"${l.name.replace(/"/g,'""')}"`, `"${l.cat}"`, `"${l.address}"`,
+    l.name, l.cat, l.address,
     l.phone||'', l.enrichedPhone||'', l.enrichedEmail||'',
     l.hasWebsite?'Yes':'No', l.rating||'', l.reviews||'', l.score
   ]);
   downloadCSV([headers,...rows], `coai-HOT-leads-${new Date().toISOString().slice(0,10)}.csv`);
 }
 
+// Quote every cell and neutralise spreadsheet formulas (= - @ tab CR, or a
+// leading + that isn't a phone number like "+1 (661) 555-0100").
+function csvCell(v){
+  let s = v == null ? '' : String(v);
+  if(/^[=\-@\t\r]/.test(s) || (/^\+/.test(s) && !/^\+[\d\s().-]+$/.test(s))) s = "'" + s;
+  return '"' + s.replace(/"/g, '""') + '"';
+}
+
 function downloadCSV(data, filename){
-  const csv = data.map(r=>r.join(',')).join('\n');
+  const csv = data.map(r=>r.map(csvCell).join(',')).join('\n');
   const blob = new Blob([csv], {type:'text/csv'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1858,8 +3223,11 @@ function downloadCSV(data, filename){
 }
 
 function clearAll(){
-  if(!confirm('Clear all leads? Cannot be undone.')) return;
+  if(!confirm('ERASE ALL LEADS? This cannot be undone.')) return;
   allLeads = []; contacted.clear(); closed.clear();
+  activeCats = new Set();
+  scannedCatCount = 0;
+  searchCache.clear();
   crmSelected.clear();
   crmExpandId = null;
   document.getElementById('leads-container').innerHTML = '';
@@ -1871,6 +3239,10 @@ function clearAll(){
   updateMainChromeVisibility();
   const wrap = document.getElementById('crm-table-wrap');
   if(wrap) wrap.innerHTML = '';
+  document.getElementById('st-found').textContent = '0';
+  document.getElementById('st-hot-stats').textContent = '0';
+  document.getElementById('st-nosite').textContent = '0';
+  document.getElementById('st-cats').textContent = '0';
   updateStats();
   saveCRMToStorage();
 }
@@ -1911,6 +3283,82 @@ function crmBulkMarkNew(){
   renderCRMTable();
   document.getElementById('s-contacted').textContent = contacted.size;
   updateExportInfo();
+}
+
+// ─── PROSPECTOR BULK ACTIONS ───
+function onBulkCheckChange(checkbox){
+  const id = decodeURIComponent(checkbox.dataset.id);
+  if(checkbox.checked) crmSelected.add(id);
+  else crmSelected.delete(id);
+  updateBulkBar();
+}
+
+function updateBulkBar(){
+  const bar = document.getElementById('bulk-bar');
+  const count = document.getElementById('bulk-count');
+  const n = crmSelected.size;
+  if(!bar || !count) return;
+  if(n > 0){
+    bar.style.display = 'flex';
+    count.textContent = n + ' selected';
+  }else{
+    bar.style.display = 'none';
+  }
+}
+
+function bulkMarkContacted(){
+  if(crmSelected.size === 0) return;
+  crmSelected.forEach(id => { if(!closed.has(id)) contacted.add(id); });
+  saveCRMToStorage();
+  applySortAndRender();
+  updateBulkBar();
+  document.getElementById('s-contacted').textContent = contacted.size;
+  updateExportInfo();
+}
+
+function bulkMarkClosed(){
+  if(crmSelected.size === 0) return;
+  crmSelected.forEach(id => { closed.add(id); contacted.add(id); });
+  saveCRMToStorage();
+  applySortAndRender();
+  updateBulkBar();
+  document.getElementById('s-closed').textContent = closed.size;
+  document.getElementById('s-contacted').textContent = contacted.size;
+  updateExportInfo();
+}
+
+function bulkDeleteSelected(){
+  if(crmSelected.size === 0 || !confirm(`Delete ${crmSelected.size} selected leads?`)) return;
+  const kill = new Set(crmSelected);
+  allLeads = allLeads.filter(l => !kill.has(l.id));
+  kill.forEach(id => { contacted.delete(id); closed.delete(id); });
+  crmSelected.clear();
+  saveCRMToStorage();
+  applySortAndRender();
+  updateBulkBar();
+  updateStats();
+  updateExportInfo();
+}
+
+function bulkExportCSV(){
+  if(crmSelected.size === 0){ alert('Select leads first.'); return; }
+  const selected = allLeads.filter(l => crmSelected.has(l.id));
+  if(selected.length === 0) return;
+  const headers = ['Name','Category','Address','Phone','Email','Website','Rating','Reviews','Score','Status','Note'];
+  const rows = selected.map(l => [
+    `"${l.name.replace(/"/g,'""')}"`, `"${l.cat}"`, `"${l.address.replace(/"/g,'""')}"`,
+    l.phone||'', l.enrichedEmail||'', l.website||'',
+    l.rating||'', l.reviews||'', l.score,
+    closed.has(l.id)?'Closed':contacted.has(l.id)?'Contacted':'New',
+    `"${(l.note||'').replace(/"/g,'""')}"`
+  ]);
+  downloadCSV([headers, ...rows], 'coai-bulk-export.csv');
+}
+
+function bulkClearSelection(){
+  crmSelected.clear();
+  document.querySelectorAll('.lead-checkbox').forEach(cb => cb.checked = false);
+  updateBulkBar();
 }
 
 function crmBulkDelete(){
@@ -2007,6 +3455,7 @@ function renderCRMTable(){
 }
 
 function initApp(){
+  loadSettings();
   if(!loadCRMFromStorage(true) || allLeads.length === 0) return;
   document.getElementById('empty-state').style.display = 'none';
   updateMainChromeVisibility();
@@ -2024,7 +3473,53 @@ function initApp(){
   document.getElementById('s-closed').textContent = closed.size;
 }
 
+// ─── OWNER ANALYTICS (sidebar) ────────────────────────────────────────
+async function loadAnalytics(){
+  const el = document.getElementById('owner-analytics');
+  const authKey = sessionStorage.getItem('coai_auth') || '';
+  if(!authKey){ el.textContent = 'Enter the owner key above first, then refresh.'; return; }
+  el.textContent = 'Loading…';
+  try {
+    const r = await fetch('/api/track', { headers: { 'Authorization': authKey }, signal: AbortSignal.timeout(15000) });
+    if(r.status === 401){ el.textContent = 'Owner key required (analytics are owner-only).'; return; }
+    const a = await r.json();
+    const esc = s => String(s).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+    const refs = (a.topReferrers30d || []).slice(0, 4)
+      .map(x => esc(x.n + ' ← ' + (x.ref || 'direct').replace(/^https?:\/\//, '').slice(0, 30))).join('<br>');
+    el.innerHTML = 'Today: <span style="color:var(--green);">' + a.today + '</span> · 7d: ' + a.last7days +
+      ' · 30d: ' + a.last30days + ' · all: ' + a.allTime +
+      (refs ? '<br><span style="color:var(--muted);">Top sources: ' + refs + '</span>' : '');
+    // Funnel: free signups → checkouts started → paid upgrades
+    const f = a.funnel || {};
+    const cell = k => ((f[k] || {}).d7 || 0) + ' / ' + ((f[k] || {}).d30 || 0);
+    el.innerHTML += '<br><b>Funnel (7d / 30d)</b><br>Signups: ' + cell('signup') +
+      ' · Checkouts: ' + cell('checkout_started') +
+      ' · <span style="color:var(--green);">Paid: ' + cell('upgrade') + '</span>';
+    const src = (a.sources30d || []).slice(0, 5)
+      .map(x => esc(x.source.slice(0, 24) + ': ' + x.visits + ' visits → ' + x.signups + ' signups → ' + x.upgrades + ' paid')).join('<br>');
+    if (src) el.innerHTML += '<br><span style="color:var(--muted);">By campaign (30d):<br>' + src + '</span>';
+  } catch(e){ el.textContent = 'Analytics unavailable right now.'; }
+}
+
 initApp();
+</script>
+<script>
+  // Campaign tags: keep the utm_* tags a visitor arrived with (for 30 days) so a
+  // signup or paid plan can be credited to the ad or post that brought them.
+  function coaiUtm() {
+    var keys = ['utm_source', 'utm_medium', 'utm_campaign'], found = {}, any = false;
+    try {
+      var q = new URLSearchParams(location.search);
+      keys.forEach(function (k) { var v = q.get(k); if (v) { found[k] = v.slice(0, 100); any = true; } });
+      if (any) { localStorage.setItem('coai_utm', JSON.stringify({ tags: found, at: Date.now() })); return found; }
+      var saved = JSON.parse(localStorage.getItem('coai_utm') || 'null');
+      if (saved && Date.now() - saved.at < 30 * 864e5) return saved.tags;
+    } catch (e) {}
+    return {};
+  }
+  try {
+    navigator.sendBeacon('/api/track', new Blob([JSON.stringify({ path: 'app', ref: document.referrer || '', utm: coaiUtm() })], { type: 'application/json' }));
+  } catch (e) {}
 </script>
 </body>
 </html>

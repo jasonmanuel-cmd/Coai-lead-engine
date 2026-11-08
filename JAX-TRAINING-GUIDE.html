@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>JAX Operator Manual — COAI Lead Engine</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --black:#0a0a0a;--surface:#111;--surface2:#161616;--surface3:#1c1c1c;
+  --border:rgba(255,255,255,0.07);--border-hot:rgba(255,255,255,0.15);
+  --green:#00ff88;--green-dim:rgba(0,255,136,0.09);
+  --red:#ff3b30;--amber:#ffb800;--blue:#3b9eff;--purple:#a78bfa;
+  --white:#f0efe8;--muted:hsl(40 9% 62%);
+  --mono:'JetBrains Mono',monospace;--sans:'Space Grotesk',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--black);color:var(--white);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh;}
+
+/* HEADER */
+.guide-header{background:var(--surface);border-bottom:1px solid var(--border);padding:2rem 3rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.guide-logo{font-weight:700;font-size:13px;letter-spacing:0.1em;color:var(--white);}
+.guide-logo span{color:var(--green);}
+.guide-title{font-size:1.6rem;font-weight:700;margin-top:0.5rem;}
+.guide-sub{color:var(--muted);font-size:13px;margin-top:6px;}
+.badge{background:linear-gradient(135deg,rgba(167,139,250,0.2),rgba(59,158,255,0.2));border:1px solid rgba(167,139,250,0.3);color:var(--purple);font-family:var(--mono);font-size:10px;letter-spacing:0.12em;padding:5px 12px;border-radius:2px;white-space:nowrap;}
+
+/* LAYOUT */
+.guide-body{max-width:960px;margin:0 auto;padding:2.5rem 2rem 4rem;}
+
+/* NAV */
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.5rem 1.8rem;margin-bottom:2.5rem;}
+.toc-title{font-family:var(--mono);font-size:10px;letter-spacing:0.14em;color:var(--green);text-transform:uppercase;margin-bottom:1rem;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;}
+.toc a{color:var(--muted);font-size:13px;text-decoration:none;padding:4px 0;display:flex;align-items:center;gap:8px;transition:color 0.15s;}
+.toc a:hover{color:var(--white);}
+.toc .toc-num{font-family:var(--mono);font-size:10px;color:var(--green);width:18px;flex-shrink:0;}
+
+/* SECTIONS */
+.section{margin-bottom:3rem;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:1.5rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);}
+.section-num{font-family:var(--mono);font-size:11px;color:var(--green);background:var(--green-dim);border:1px solid rgba(0,255,136,0.2);padding:3px 9px;border-radius:2px;white-space:nowrap;}
+.section-title{font-size:1.15rem;font-weight:700;}
+
+/* BLOCKS */
+.step-grid{display:grid;gap:12px;}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.2rem 1.4rem;display:flex;gap:1rem;align-items:flex-start;}
+.step-icon{font-family:var(--mono);font-size:1.2rem;color:var(--green);flex-shrink:0;width:32px;text-align:center;padding-top:2px;}
+.step-content{}
+.step-label{font-weight:700;font-size:13px;margin-bottom:4px;}
+.step-desc{color:var(--muted);font-size:12.5px;line-height:1.65;}
+.step-desc strong{color:var(--white);}
+.step-desc code{font-family:var(--mono);font-size:11px;background:var(--surface2);border:1px solid var(--border);padding:1px 5px;border-radius:2px;color:var(--amber);}
+
+/* SIGNAL TABLE */
+.signal-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:0.5rem;}
+.signal-table th{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);background:var(--surface2);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);}
+.signal-table td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+.signal-table tr:hover td{background:rgba(255,255,255,0.02);}
+.sig-val{font-family:var(--mono);font-weight:700;}
+.sig-hot{color:var(--red);}
+.sig-warn{color:var(--amber);}
+.sig-ok{color:var(--green);}
+
+/* CALLOUT */
+.callout{border-radius:4px;padding:1rem 1.2rem;margin:1rem 0;display:flex;gap:12px;align-items:flex-start;}
+.callout.green{background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.18);}
+.callout.amber{background:rgba(255,184,0,0.07);border:1px solid rgba(255,184,0,0.22);}
+.callout.red{background:rgba(255,59,48,0.07);border:1px solid rgba(255,59,48,0.22);}
+.callout.blue{background:rgba(59,158,255,0.07);border:1px solid rgba(59,158,255,0.22);}
+.callout-icon{font-size:1.1rem;flex-shrink:0;padding-top:2px;}
+.callout-body{font-size:12.5px;line-height:1.65;}
+.callout-body strong{font-weight:700;}
+.callout.green .callout-body{color:#b2ffd8;}
+.callout.amber .callout-body{color:#ffe4a0;}
+.callout.red .callout-body{color:#ffb5b0;}
+.callout.blue .callout-body{color:#b3d9ff;}
+
+/* PILL BADGES */
+.pill{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;padding:3px 9px;border-radius:2px;letter-spacing:0.06em;text-transform:uppercase;margin:2px;}
+.pill-hot{background:rgba(255,59,48,0.15);color:var(--red);border:1px solid rgba(255,59,48,0.25);}
+.pill-warm{background:rgba(255,184,0,0.12);color:var(--amber);border:1px solid rgba(255,184,0,0.2);}
+.pill-cold{background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--border);}
+.pill-green{background:var(--green-dim);color:var(--green);border:1px solid rgba(0,255,136,0.2);}
+.pill-blue{background:rgba(59,158,255,0.1);color:var(--blue);border:1px solid rgba(59,158,255,0.2);}
+
+/* QUICK REF GRID */
+.ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:0.75rem;}
+.ref-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1rem;}
+.ref-card-title{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--green);margin-bottom:0.5rem;}
+.ref-card-body{font-size:12px;color:var(--muted);line-height:1.7;}
+.ref-card-body strong{color:var(--white);}
+
+/* FOOTER */
+.guide-footer{background:var(--surface);border-top:1px solid var(--border);padding:1.5rem 3rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
+.footer-brand{font-family:var(--mono);font-size:11px;color:var(--muted);}
+.footer-brand span{color:var(--green);}
+
+@media(max-width:700px){
+  .guide-header{padding:1.5rem;}
+  .guide-body{padding:1.5rem 1rem 3rem;}
+  .step{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<div class="guide-header">
+  <div>
+    <div class="guide-logo">COAI <span>LEAD ENGINE</span></div>
+    <div class="guide-title">JAX Operator Manual</div>
+    <div class="guide-sub">Everything you need to run the prospector from zero to closed deal.</div>
+  </div>
+  <div class="badge">⚡ INTERNAL USE ONLY</div>
+</div>
+
+<div class="guide-body">
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <div class="toc-title">Table of Contents</div>
+    <div class="toc-grid">
+      <a href="#s1"><span class="toc-num">01</span>What This Tool Does</a>
+      <a href="#s2"><span class="toc-num">02</span>Logging In</a>
+      <a href="#s3"><span class="toc-num">03</span>Picking Your Hunt</a>
+      <a href="#s4"><span class="toc-num">04</span>Advanced Filters</a>
+      <a href="#s5"><span class="toc-num">05</span>Reading Lead Cards</a>
+      <a href="#s6"><span class="toc-num">06</span>Scoring System</a>
+      <a href="#s7"><span class="toc-num">07</span>Working the CRM</a>
+      <a href="#s8"><span class="toc-num">08</span>Outreach Scripts</a>
+      <a href="#s9"><span class="toc-num">09</span>Exporting Data</a>
+      <a href="#s10"><span class="toc-num">10</span>Backup &amp; Restore</a>
+      <a href="#s11"><span class="toc-num">11</span>Daily Workflow</a>
+      <a href="#s12"><span class="toc-num">12</span>Troubleshooting</a>
+    </div>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-title">What This Tool Does</span>
+    </div>
+    <p style="color:var(--muted);margin-bottom:1rem;line-height:1.7;">The COAI Lead Engine is a prospecting machine that scans Google Maps for local businesses in Bakersfield and surrounding areas, then scores each one based on how badly they need your services. It pulls real data — phone numbers, websites, star ratings, review counts — and ranks every business by "opportunity score." The higher the score, the weaker their digital presence, and the easier the close.</p>
+    <div class="callout green">
+      <div class="callout-icon">◉</div>
+      <div class="callout-body"><strong>The Core Logic:</strong> A business with no website, 2 stars, and 4 reviews is in pain. They're losing leads to competitors every day. You're calling them with a $1,200 solution that fixes all of it. That's why we score for weakness, not strength.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-title">Logging In</span>
+    </div>
+    <div class="step-grid">
+      <div class="step">
+        <div class="step-icon">1</div>
+        <div class="step-content">
+          <div class="step-label">Open the tool</div>
+          <div class="step-desc">Go to the deployed URL (e.g. <code>coai-leads.vercel.app</code>). You don't need to create an account — this is a private tool.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">2</div>
+        <div class="step-content">
+          <div class="step-label">Find the App Access Key field</div>
+          <div class="step-desc">Look in the left sidebar at the bottom — there's a password field labeled <strong>App Access Key</strong>. This is the only credential you need.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">3</div>
+        <div class="step-content">
+          <div class="step-label">Enter your key and scan</div>
+          <div class="step-desc">Type in the access key Jason gave you. You only have to enter it once per browser session — it stays saved until you close the tab. Then click <strong>◉ SCAN FOR LEADS</strong>.</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout amber" style="margin-top:1rem;">
+      <div class="callout-icon">⚠</div>
+      <div class="callout-body"><strong>Wrong key?</strong> You'll see "ACCESS DENIED." Double-check with Jason. The key is case-sensitive.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <span class="section-title">Picking Your Hunt (Location + Industries)</span>
+    </div>
+    <div class="step-grid">
+      <div class="step">
+        <div class="step-icon">📍</div>
+        <div class="step-content">
+          <div class="step-label">Section 1 · Location &amp; Radius</div>
+          <div class="step-desc">
+            The <strong>City / Area</strong> field defaults to <code>Bakersfield, CA</code>. You can change it to any city.<br><br>
+            <strong>Radius options:</strong><br>
+            • <strong>2 miles</strong> — Core 661, downtown Bakersfield only<br>
+            • <strong>5 miles</strong> — Greater Bakersfield (recommended starting point)<br>
+            • <strong>10 miles</strong> — All of Kern County<br>
+            • <strong>25–50 miles</strong> — Central Valley / max range
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">🏭</div>
+        <div class="step-content">
+          <div class="step-label">Section 2 · Industries</div>
+          <div class="step-desc">
+            Pick which business types to scan. You have three shortcuts at the top:<br><br>
+            • <strong>Select All</strong> — scans every category (slow but thorough)<br>
+            • <strong>Clear All</strong> — resets everything<br>
+            • <strong>Hot Only</strong> — pre-selects the highest-converting categories: HVAC, plumbing, roofing, auto repair, dentist, hair salon, locksmith, AI consulting, and more<br><br>
+            You can also click individual categories or use the <strong>All</strong> button next to each vertical (Trades, Auto, Medical, etc.) to toggle that whole group.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout blue" style="margin-top:1rem;">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body"><strong>Pro Tip:</strong> Start with <strong>Hot Only</strong> + <strong>5-mile radius</strong>. You'll get the best leads fastest. Only go wider if you're running dry on a category.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <span class="section-title">Advanced Filters &amp; Scoring (Section 3)</span>
+    </div>
+    <p style="color:var(--muted);margin-bottom:1rem;">Click <strong style="color:var(--white);">3 · Advanced · filters · scoring</strong> in the sidebar to expand. These let you narrow results so you only see the leads you want to call.</p>
+    <div class="ref-grid">
+      <div class="ref-card">
+        <div class="ref-card-title">Results / Category</div>
+        <div class="ref-card-body">How many listings to pull per industry. <strong>40</strong> is the default. Max is 60 (Google's hard limit).</div>
+      </div>
+      <div class="ref-card">
+        <div class="ref-card-title">Min Opportunity Score</div>
+        <div class="ref-card-body">Set to <strong>50+</strong> to see only HOT leads. Set to 0 to see everything.</div>
+      </div>
+      <div class="ref-card">
+        <div class="ref-card-title">Min / Max Reviews</div>
+        <div class="ref-card-body">Filter by review count. <strong>Max Reviews = 25</strong> is a great filter — catches businesses that are active but still small enough to need help.</div>
+      </div>
+      <div class="ref-card">
+        <div class="ref-card-title">Min / Max Rating</div>
+        <div class="ref-card-body">Default max is <strong>4.0</strong> — catches businesses with reputation problems. Drop to 3.5 for more distressed leads.</div>
+      </div>
+      <div class="ref-card">
+        <div class="ref-card-title">Website Mode</div>
+        <div class="ref-card-body">Set to <strong>No website only</strong> to hunt pure no-site leads. These score highest and close fastest.</div>
+      </div>
+      <div class="ref-card">
+        <div class="ref-card-title">Exclude Keyword</div>
+        <div class="ref-card-body">Type <code>franchise</code> here to filter out chain locations. We want owner-operated businesses.</div>
+      </div>
+    </div>
+    <div class="callout green" style="margin-top:1rem;">
+      <div class="callout-icon">◉</div>
+      <div class="callout-body"><strong>Fastest Close Setup:</strong> Website Mode = "No website only" · Max Reviews = 25 · Min Score = 40 · Exclude "franchise". This gives you a list of real local owners who have zero digital presence and can't ignore the pitch.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <span class="section-title">Reading a Lead Card</span>
+    </div>
+    <div class="step-grid">
+      <div class="step">
+        <div class="step-icon">🔝</div>
+        <div class="step-content">
+          <div class="step-label">Top Row — Name + Score Badge</div>
+          <div class="step-desc">
+            Business name on the left. Score badge on the right:<br><br>
+            <span class="pill pill-hot">🔥 HOT · 65</span> — Score 50+. Multiple pain signals. Priority call.<br>
+            <span class="pill pill-warm">WARM · 35</span> — Score 25–49. Some signals. Good call.<br>
+            <span class="pill pill-cold">COLD · 15</span> — Score under 25. Few signals. Low priority.
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">🏷</div>
+        <div class="step-content">
+          <div class="step-label">Signal Tags</div>
+          <div class="step-desc">
+            The colored chips below the address tell you exactly why they scored the way they did:<br><br>
+            <span class="pill pill-hot">No Website</span> <span class="pill pill-hot">2.8★</span> <span class="pill pill-hot">0 Reviews</span> — Red = bad, these are pain points you pitch against.<br>
+            <span class="pill pill-warm">No Rating</span> <span class="pill pill-warm">3 Reviews</span> — Amber = warning signals.<br>
+            <span class="pill pill-green">Active Biz</span> <span class="pill pill-green">Maps profile</span> — Green = positive signs.<br>
+            <span class="pill" style="background:rgba(255,184,0,0.08);color:var(--amber);border:1px solid rgba(255,184,0,0.2);">⚠ Stale 45d ago</span> — Data is over 30 days old. Re-check before calling.
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">🔘</div>
+        <div class="step-content">
+          <div class="step-label">Action Buttons</div>
+          <div class="step-desc">
+            <strong>Maps</strong> — Opens their Google Maps listing in a new tab. Use this to verify the business before calling.<br>
+            <strong>Call [phone]</strong> — One-tap call from mobile.<br>
+            <strong>Website</strong> — Opens their site (if they have one).<br>
+            <strong>Outreach</strong> — Opens the script generator for this lead.<br>
+            <strong>Contacted</strong> — Marks lead as contacted. Card dims to 45% opacity.<br>
+            <strong>Undo</strong> — Reverts contacted status.<br>
+            <strong>Closed ✓</strong> — Marks as won. Card turns green.<br>
+            <strong>Note</strong> — Opens a text box to add your own notes for this lead.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <span class="section-title">How the Scoring System Works</span>
+    </div>
+    <p style="color:var(--muted);margin-bottom:1rem;">Each lead gets a score from 0–100 based on their pain signals. The higher the score, the more they need you.</p>
+    <table class="signal-table">
+      <thead>
+        <tr>
+          <th>Signal</th>
+          <th>Default Points</th>
+          <th>Why It Matters</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="pill pill-hot">No Website</span></td>
+          <td class="sig-val sig-hot">+40</td>
+          <td style="color:var(--muted);">They're invisible online. You're selling them visibility. Easiest pitch.</td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-hot">Low Rating (under 3.5★)</span></td>
+          <td class="sig-val sig-hot">+25</td>
+          <td style="color:var(--muted);">Reputation damage is costing them leads daily. They know it hurts.</td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-warn">No Rating</span></td>
+          <td class="sig-val sig-warn">+20</td>
+          <td style="color:var(--muted);">New or inactive business. Needs reputation foundation.</td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-warn">Low Reviews (under 10)</span></td>
+          <td class="sig-val sig-warn">+15</td>
+          <td style="color:var(--muted);">They're not capturing happy customers. Easy system to pitch.</td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-cold">No Phone Listed</span></td>
+          <td class="sig-val" style="color:var(--muted);">+10</td>
+          <td style="color:var(--muted);">Losing calls before they happen. Basic setup problem.</td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-cold">Zero Reviews</span></td>
+          <td class="sig-val" style="color:var(--muted);">+10</td>
+          <td style="color:var(--muted);">Combined with no website = 50+ score by default. HOT lead.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout amber" style="margin-top:1rem;">
+      <div class="callout-icon">⚙</div>
+      <div class="callout-body"><strong>Score Weights are editable.</strong> In Section 3 of the sidebar, scroll down to see the weight sliders. Jason may adjust these for different campaigns.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <span class="section-num">07</span>
+      <span class="section-title">Working the CRM</span>
+    </div>
+    <p style="color:var(--muted);margin-bottom:1rem;">Click the <strong style="color:var(--white);">CRM</strong> tab at the top of the main panel to switch to the CRM view. This shows all your leads in a table format — easier for tracking.</p>
+    <div class="step-grid">
+      <div class="step">
+        <div class="step-icon">🔍</div>
+        <div class="step-content">
+          <div class="step-label">Search + Filter</div>
+          <div class="step-desc">Use the <strong>Search</strong> box to find any lead by name, address, phone, or email. Use the <strong>Category</strong> and <strong>Status</strong> dropdowns to narrow by industry or contact stage.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">✓</div>
+        <div class="step-content">
+          <div class="step-label">Status Pipeline</div>
+          <div class="step-desc">
+            Every lead has one of three statuses:<br>
+            <span class="pill pill-cold">New</span> — Haven't contacted yet.<br>
+            <span class="pill pill-warm">Contacted</span> — You've reached out. Follow up in 3–5 days.<br>
+            <span class="pill pill-green">Closed</span> — Deal won. Celebrate.
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">☐</div>
+        <div class="step-content">
+          <div class="step-label">Bulk Actions</div>
+          <div class="step-desc">Check the boxes on the left to select multiple rows. Then use <strong>Mark contacted</strong>, <strong>Mark new</strong>, or <strong>Delete selected</strong> buttons to update them all at once.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">📜</div>
+        <div class="step-content">
+          <div class="step-label">Scripts in CRM</div>
+          <div class="step-desc">Click the <strong>Scripts</strong> button on any CRM row to expand pre-written text, email, and voicemail scripts for that exact lead. Use <strong>Copy</strong> to grab them instantly.</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout blue" style="margin-top:1rem;">
+      <div class="callout-icon">💾</div>
+      <div class="callout-body"><strong>Auto-Save:</strong> The CRM saves automatically to your browser every time you make a change. You don't need to hit a save button. But do NOT clear your browser cache without first doing a JSON backup (Section 10).</div>
+    </div>
+  </div>
+
+  <!-- SECTION 8 -->
+  <div class="section" id="s8">
+    <div class="section-header">
+      <span class="section-num">08</span>
+      <span class="section-title">Outreach Scripts</span>
+    </div>
+    <p style="color:var(--muted);margin-bottom:1rem;">Click <strong style="color:var(--white);">Outreach</strong> on any lead card or CRM row to open the script generator for that business.</p>
+    <div class="step-grid">
+      <div class="step">
+        <div class="step-icon">💬</div>
+        <div class="step-content">
+          <div class="step-label">Text / DM</div>
+          <div class="step-desc">Short, direct message. Best for Instagram DM or SMS. Under 100 words. References the lead's specific pain point (no website, low rating, etc.).</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">📧</div>
+        <div class="step-content">
+          <div class="step-label">Cold Email</div>
+          <div class="step-desc">Has a subject line + 3-paragraph body. Use this when you find an email from the website enrichment (the blue <strong>✉</strong> button on a lead card).</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">📞</div>
+        <div class="step-content">
+          <div class="step-label">Voicemail Script</div>
+          <div class="step-desc">Reads in under 60 seconds. The callback number (661) 610-9198 appears twice. Read this naturally — don't sound like you're reading.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">⚡</div>
+        <div class="step-content">
+          <div class="step-label">AI Personalize Button</div>
+          <div class="step-desc">Click <strong>⚡ AI Personalize</strong> to generate a custom script using Claude AI. It reads the lead's specific signals and writes a message that addresses their exact gap. Different every time. Takes 3–5 seconds.</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout green" style="margin-top:1rem;">
+      <div class="callout-icon">◉</div>
+      <div class="callout-body"><strong>Best Practice:</strong> Always hit <strong>⚡ AI Personalize</strong> before copying a script. The AI version references their specific score signals (e.g. "I noticed you only have 3 reviews and no website listed") which closes 2–3x better than generic templates.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 9 -->
+  <div class="section" id="s9">
+    <div class="section-header">
+      <span class="section-num">09</span>
+      <span class="section-title">Exporting Data</span>
+    </div>
+    <p style="color:var(--muted);margin-bottom:1rem;">At the bottom of the Prospector panel you'll see the export bar.</p>
+    <div class="ref-grid">
+      <div class="ref-card">
+        <div class="ref-card-title">↓ Export CSV</div>
+        <div class="ref-card-body">Exports ALL leads with full data: name, category, address, phone, enriched phone, email, website, rating, reviews, score, status, notes, and scan date. Opens in Excel or Google Sheets.</div>
+      </div>
+      <div class="ref-card">
+        <div class="ref-card-title">↓ Hot Only CSV</div>
+        <div class="ref-card-body">Exports only leads with score 50+. Smaller file, just the top-tier targets. Best for sharing with Jason.</div>
+      </div>
+      <div class="ref-card">
+        <div class="ref-card-title">✕ Clear All</div>
+        <div class="ref-card-body"><strong style="color:var(--red);">Warning:</strong> This clears all leads from the view. Make sure to export first or do a JSON backup before clearing.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 10 -->
+  <div class="section" id="s10">
+    <div class="section-header">
+      <span class="section-num">10</span>
+      <span class="section-title">Backup &amp; Restore</span>
+    </div>
+    <p style="color:var(--muted);margin-bottom:1rem;">CRM data lives in your browser. To protect it, use the backup buttons in the sidebar under <strong style="color:var(--white);">Session Stats</strong>.</p>
+    <div class="step-grid">
+      <div class="step">
+        <div class="step-icon">↓</div>
+        <div class="step-content">
+          <div class="step-label">↓ Backup JSON</div>
+          <div class="step-desc">Downloads a <code>.json</code> file with all your leads, statuses, notes, and timestamps. Save this to a folder or Google Drive. Do this at least weekly — daily if you're scanning every day.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">↑</div>
+        <div class="step-content">
+          <div class="step-label">↑ Restore JSON</div>
+          <div class="step-desc">Loads a backup file back into the tool. You'll be asked to confirm before it replaces your current CRM. Use this if you switch computers or accidentally clear the browser.</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout red" style="margin-top:1rem;">
+      <div class="callout-icon">🚨</div>
+      <div class="callout-body"><strong>Critical:</strong> Clearing your browser cookies/cache or using a private/incognito window will wipe the CRM. Always back up before switching devices or clearing browser data.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 11 -->
+  <div class="section" id="s11">
+    <div class="section-header">
+      <span class="section-num">11</span>
+      <span class="section-title">Daily Workflow — The Repeatable Play</span>
+    </div>
+    <div class="step-grid">
+      <div class="step">
+        <div class="step-icon">1</div>
+        <div class="step-content">
+          <div class="step-label">Open the tool, enter your key</div>
+          <div class="step-desc">Takes 10 seconds. Key stays saved for the session.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">2</div>
+        <div class="step-content">
+          <div class="step-label">Click "Hot Only" → pick a vertical → Scan</div>
+          <div class="step-desc">Focus on one vertical per session (e.g. just Trades, or just Medical). Keeps your calls focused and consistent.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">3</div>
+        <div class="step-content">
+          <div class="step-label">Filter to "🔥 Hot" leads only</div>
+          <div class="step-desc">Click the <strong>🔥 Hot</strong> filter chip. Work top-to-bottom by score. Don't skip HOT leads to chase ones you "like better."</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">4</div>
+        <div class="step-content">
+          <div class="step-label">For each HOT lead: Verify → Script → Contact</div>
+          <div class="step-desc">1. Click <strong>Maps</strong> to confirm the business is real and active. 2. Click <strong>Outreach</strong> → hit <strong>⚡ AI Personalize</strong>. 3. Call, DM, or email using the script. 4. Hit <strong>Contacted</strong> immediately after.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">5</div>
+        <div class="step-content">
+          <div class="step-label">End of session: Backup + Export</div>
+          <div class="step-desc">Click <strong>↓ Backup JSON</strong> to save your CRM state. Click <strong>↓ Export CSV</strong> for a snapshot. Log your stats with Jason.</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout green" style="margin-top:1rem;">
+      <div class="callout-icon">🎯</div>
+      <div class="callout-body"><strong>Target KPIs:</strong> 20–30 HOT leads contacted per day. 3–5 callbacks. 1–2 audit calls booked. 1 close per week to start. These numbers go up as you get comfortable with the scripts.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 12 -->
+  <div class="section" id="s12">
+    <div class="section-header">
+      <span class="section-num">12</span>
+      <span class="section-title">Troubleshooting</span>
+    </div>
+    <table class="signal-table">
+      <thead>
+        <tr>
+          <th>Problem</th>
+          <th>Fix</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:var(--red);">ACCESS DENIED</td>
+          <td style="color:var(--muted);">Wrong App Access Key. Double check with Jason — it's case-sensitive.</td>
+        </tr>
+        <tr>
+          <td style="color:var(--amber);">Zero results after scan</td>
+          <td style="color:var(--muted);">Expand radius to 25–50 miles. Select more categories. Wait 60 seconds and retry.</td>
+        </tr>
+        <tr>
+          <td style="color:var(--amber);">Leads show "No Phone" but they definitely have one</td>
+          <td style="color:var(--muted);">Make sure "Skip Google Place Details" is <strong>unchecked</strong> in Section 3. Place Details is what pulls accurate phones and websites.</td>
+        </tr>
+        <tr>
+          <td style="color:var(--amber);">⚡ AI Personalize just shows the same template</td>
+          <td style="color:var(--muted);">Run a scan first — this sets your session key. If you're on a fresh tab, AI can't authenticate.</td>
+        </tr>
+        <tr>
+          <td style="color:var(--amber);">Stale badge on old leads</td>
+          <td style="color:var(--muted);">Lead was scanned 30+ days ago. Re-scan that category to get fresh data before calling.</td>
+        </tr>
+        <tr>
+          <td style="color:var(--red);">CRM is empty after reopening</td>
+          <td style="color:var(--muted);">Browser cleared its cache. Always restore from your most recent JSON backup using <strong>↑ Restore JSON</strong>.</td>
+        </tr>
+        <tr>
+          <td style="color:var(--amber);">Tool is slow during enrichment</td>
+          <td style="color:var(--muted);">Normal — the tool is fetching Place Details for each listing. 40 leads takes about 60–90 seconds. Don't close the tab.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout blue" style="margin-top:1.5rem;">
+      <div class="callout-icon">📞</div>
+      <div class="callout-body"><strong>Still stuck?</strong> Text Jason at (661) 610-9198 with a screenshot of the error. Don't guess — ask.</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="guide-footer">
+  <div class="footer-brand">COAI <span>LEAD ENGINE</span> · Internal Operator Manual · v2.0</div>
+  <div class="footer-brand" style="text-align:right;">Chaotically Organized AI, LLC · Bakersfield, CA 661</div>
+</div>
+
+</body>
+</html>

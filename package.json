@@ -1,13 +1,29 @@
 {
   "name": "coai-leads",
   "private": true,
-  "version": "1.0.0",
-  "description": "COAI Leads API functions",
+  "version": "2.0.0",
+  "description": "COAI Lead Engine — God-Tier prospector with 4-level scraping escalation",
   "type": "commonjs",
+  "scripts": {
+    "start": "vercel dev",
+    "deploy": "vercel deploy --prod"
+  },
   "dependencies": {
+    "@google/genai": "^2.4.0",
     "@sparticuz/chromium": "^123.0.1",
     "@vercel/analytics": "^2.0.1",
+    "capsolver": "^1.0.1",
+    "dotenv": "^16.3.1",
+    "https-proxy-agent": "^9.0.0",
+    "impit": "^0.14.0",
     "libphonenumber-js": "^1.12.41",
-    "puppeteer-core": "^24.6.0"
+    "nodemailer": "^10.1.4",
+    "pg": "^8.11.3",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-core": "^25.16.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "robots-parser": "^3.0.1",
+    "zod": "^4.6.7"
   }
 }

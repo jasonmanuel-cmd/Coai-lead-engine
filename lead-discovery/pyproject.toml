@@ -1,0 +1,16 @@
+[project]
+name = "prime-agent-skill-lead-discovery"
+version = "0.1.0"
+description = "Find Bakersfield businesses with no website, outdated sites, or WordPress sites, for COAI lead generation"
+requires-python = ">=3.10"
+dependencies = ["httpx>=0.27,<1", "prime-agent-runtime"]
+
+[project.scripts]
+run = "rlm.skill:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lead_discovery"]

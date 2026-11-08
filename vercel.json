@@ -1,11 +1,64 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/search.js", "use": "@vercel/node" },
-    { "src": "index.html", "use": "@vercel/static" }
+    { "src": "api/search.js",   "use": "@vercel/node" },
+    { "src": "api/scrape.js",  "use": "@vercel/node" },
+    { "src": "api/outreach.js", "use": "@vercel/node" },
+    { "src": "api/audit.js", "use": "@vercel/node" },
+    { "src": "api/discover.js", "use": "@vercel/node" },
+    { "src": "api/stats.js", "use": "@vercel/node" },
+    { "src": "api/auth.js", "use": "@vercel/node" },
+    { "src": "api/billing.js", "use": "@vercel/node" },
+    { "src": "api/stripe-webhook.js", "use": "@vercel/node" },
+    { "src": "api/square-webhook.js", "use": "@vercel/node" },
+    { "src": "api/track.js", "use": "@vercel/node" },
+    { "src": "api/cron-discover.js", "use": "@vercel/node" },
+    { "src": "api/cron-audit.js", "use": "@vercel/node" },
+    { "src": "api/cron-qualify.js", "use": "@vercel/node" },
+    { "src": "api/cron-outreach.js", "use": "@vercel/node" },
+    { "src": "tos.html", "use": "@vercel/static" },
+    { "src": "privacy.html", "use": "@vercel/static" },
+    { "src": "index.html",      "use": "@vercel/static" },
+    { "src": "landing.html",    "use": "@vercel/static" },
+    { "src": "og-image.png",    "use": "@vercel/static" },
+    { "src": "robots.txt",      "use": "@vercel/static" },
+    { "src": "sitemap.xml",     "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/api/search", "dest": "/api/search.js" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "src": "/", "dest": "/landing.html" },
+    { "src": "/app", "dest": "/index.html" },
+    { "src": "/api/search",   "dest": "/api/search.js"   },
+    { "src": "/api/scrape",   "dest": "/api/scrape.js"   },
+    { "src": "/api/outreach", "dest": "/api/outreach.js" },
+    { "src": "/api/audit",    "dest": "/api/audit.js"    },
+    { "src": "/api/discover", "dest": "/api/discover.js" },
+    { "src": "/api/stats",    "dest": "/api/stats.js"    },
+    { "src": "/api/auth",     "dest": "/api/auth.js"     },
+    { "src": "/api/billing",  "dest": "/api/billing.js"  },
+    { "src": "/api/stripe-webhook", "dest": "/api/stripe-webhook.js" },
+    { "src": "/api/square-webhook", "dest": "/api/square-webhook.js" },
+    { "src": "/api/track", "dest": "/api/track.js" },
+    { "src": "/api/cron-discover", "dest": "/api/cron-discover.js" },
+    { "src": "/api/cron-audit", "dest": "/api/cron-audit.js" },
+    { "src": "/api/cron-qualify", "dest": "/api/cron-qualify.js" },
+    { "src": "/api/cron-outreach", "dest": "/api/cron-outreach.js" },
+    { "src": "/tos", "dest": "/tos.html" },
+    { "src": "/privacy", "dest": "/privacy.html" },
+    { "src": "/robots.txt", "dest": "/robots.txt" },
+    { "src": "/sitemap.xml", "dest": "/sitemap.xml" },
+    { "src": "/og-image.png", "dest": "/og-image.png" },
+    { "src": "/(.*)",         "dest": "/index.html"      }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" }
+      ]
+    }
   ]
 }
