@@ -9,6 +9,7 @@
 //   DATABASE_URL  (for accounts/usage)
 
 const { requireMeteredCaller, recordUsage } = require('../lib/saas');
+const { safeEqual } = require('../lib/cron-auth');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', process.env.SITE_URL || 'https://coaihq.online');
@@ -17,13 +18,22 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   let caller;
-  try {
-    caller = await requireMeteredCaller(req);
-  } catch (authErr) {
-    return res.status(authErr.statusCode || 401).json({
-      error: authErr.message,
-      upgrade: Boolean(authErr.upgrade),
-    });
+  // Night Ops key: a narrow key for the nightly lead run. It opens THIS
+  // endpoint only (search + place details), never outreach, billing or stats,
+  // so a leaked copy can't send email or touch accounts. Unset = disabled.
+  const nightKey = process.env.NIGHTOPS_KEY;
+  const authHeader = String(req.headers.authorization || '');
+  if (nightKey && authHeader && safeEqual(authHeader, nightKey)) {
+    caller = { admin: false, id: 0, email: 'nightops', plan: 'nightops', planName: 'Night Ops', quota: 'unmetered', usage: 0 };
+  } else {
+    try {
+      caller = await requireMeteredCaller(req);
+    } catch (authErr) {
+      return res.status(authErr.statusCode || 401).json({
+        error: authErr.message,
+        upgrade: Boolean(authErr.upgrade),
+      });
+    }
   }
 
   const {
