@@ -87,7 +87,7 @@ git add -A && git commit -m "your message" && git push   # auto-deploys to coaih
 
 ## 🌙 Night Ops nightly harvest (`/api/cron-nightops`)
 
-Vercel Cron calls it at **08:30 UTC** (12:30 AM PST / 1:30 AM PDT), ahead of the
+Vercel Cron calls it at **08:15 UTC** (12:15 AM PST / 1:15 AM PDT), ahead of the
 Night Ops routine at 1:43 AM Pacific. It pulls one rotation group of Bakersfield
 businesses from Google Maps and writes them to the **Night Ops database**
 (Neon project `coai-nightops`, table `nightly_leads`, run log `nightops_runs`).
@@ -103,3 +103,29 @@ goes into the routine's prompt. Schema: `sql/nightops.sql`.
 - Env (Production): `CRON_SECRET`, `GOOGLE_PLACES_API_KEY`, `NIGHTOPS_DATABASE_URL`.
 - Manual run: `curl -H "Authorization: Bearer $CRON_SECRET" https://coaihq.online/api/cron-nightops`
 - Tests: `npm test` (no network, no database).
+
+### After the pull (all before the 1:43 AM routine, all year)
+
+| UTC | Route | What it writes |
+|---|---|---|
+| 08:15 | `/api/cron-nightops` | tonight's leads, each tagged `track` = `audit` (own site) or `build` (no site of its own) with `build_score` |
+| 08:30 | `/api/cron-nightops-contacts` | `email`, `emails`, `contact_form_url`, `contact_note` for new own-site leads (reads their site; no Google) |
+| 08:40 | `/api/cron-nightops-followups` | `draft` rows in `outreach_touches` for leads due touch 2 (day 3) or touch 3 (day 7) |
+
+All three take `CRON_SECRET` or `NIGHTOPS_RUN_SECRET` (header or `?secret=`); use
+`https://www.coaihq.online/...` for manual runs (the apex redirects).
+Optional: `NIGHTOPS_SIGNATURE` (use `\n` for line breaks) replaces the default
+COAI sign-off on follow-up drafts.
+
+**Nothing in this repo sends email.** Follow-ups are drafts until Jay presses Send.
+Whoever sends a touch records it:
+
+```sql
+-- after touch 1 goes out
+INSERT INTO outreach_touches (lead_key, place_id, business_name, email, touch_no, subject, body, fact, offer, status, sent_at)
+VALUES ($place_id_or_email, $place_id, $name, $email, 1, $subject, $body, $quoted_fact, $offer, 'sent', now());
+-- after Jay sends a drafted follow-up
+UPDATE outreach_touches SET status = 'sent', sent_at = now() WHERE id = $id AND status = 'draft';
+-- a reply, a bounce, or "no thanks" (stops the lead; opt-out stops that address everywhere)
+UPDATE outreach_touches SET status = 'replied' WHERE lead_key = $key AND touch_no = $n;
+```
