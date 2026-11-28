@@ -7,6 +7,10 @@ const N = require('../lib/nightops');
 
 // ---- fakes ----------------------------------------------------------------
 
+const idNum = (id) => Number(String(id).split('-').pop());
+const siteFor = (id) => (idNum(id) % 3 === 0 ? undefined
+  : idNum(id) % 5 === 0 ? 'https://www.facebook.com/somebiz' : 'https://example-' + String(id).replace(/[^a-z0-9]+/gi, '-') + '.com');
+
 function fakeGoogle({ perPage = 20, pages = 3, geocodeStatus = 'OK' } = {}) {
   const calls = { geocode: 0, nearby: 0, details: 0 };
   async function fetchJson(url) {
@@ -35,7 +39,7 @@ function fakeGoogle({ perPage = 20, pages = 3, geocodeStatus = 'OK' } = {}) {
       const id = u.searchParams.get('place_id');
       assert.ok(!/rating|review|opening/.test(u.searchParams.get('fields')), 'no Atmosphere fields');
       return { status: 'OK', result: { name: `Biz ${id}`, formatted_phone_number: '(661) 555-0100',
-        website: 'https://example.com', formatted_address: '1 Main St, Bakersfield, CA 93301, USA',
+        website: siteFor(id), formatted_address: '1 Main St, Bakersfield, CA 93301, USA',
         url: `https://maps.google.com/?cid=${id}` } };
     }
     throw new Error('unexpected url ' + url);
@@ -47,7 +51,7 @@ function fakeDb({ prior = [], tonight = [], onlyCapped = [] } = {}) {
   const rows = [];
   const runs = [];
   async function query(text, params = []) {
-    if (/^CREATE/.test(text.trim())) return { rows: [] };
+    if (/^(CREATE|ALTER)/.test(text.trim())) return { rows: [] };
     if (/INSERT INTO nightops_runs/.test(text)) { runs.push({ start: params }); return { rows: [] }; }
     if (/UPDATE nightops_runs/.test(text)) { runs.push({ end: params }); return { rows: [] }; }
     if (/bool_or/.test(text)) {
@@ -60,14 +64,19 @@ function fakeDb({ prior = [], tonight = [], onlyCapped = [] } = {}) {
     }
     if (/INSERT INTO nightly_leads/.test(text)) {
       let n = 0;
-      for (let i = 0; i < params.length; i += 14) {
-        const p = params.slice(i, i + 14);
+      for (let i = 0; i < params.length; i += 17) {
+        const p = params.slice(i, i + 17);
         if (rows.some((r) => r.place_id === p[8])) continue; // ON CONFLICT DO NOTHING
         rows.push({ night_date: p[0], lead_group: p[1], category: p[2], business_name: p[3],
-          phone: p[4], website: p[5], address: p[6], locality: p[7], place_id: p[8], status: p[13] });
+          phone: p[4], website: p[5], address: p[6], locality: p[7], place_id: p[8], status: p[13], site_kind: p[14], track: p[15], build_score: p[16] });
         n++;
       }
       return { rowCount: n, rows: [] };
+    }
+    if (/SELECT track, count/.test(text)) {
+      const c = {};
+      for (const r of rows.filter((x) => x.status === 'new')) c[r.track] = (c[r.track] || 0) + 1;
+      return { rows: Object.entries(c).map(([track, n]) => ({ track, n })) };
     }
     if (/SELECT status, count/.test(text)) {
       const c = {};
@@ -108,7 +117,7 @@ test('details cap can be lowered by env but never raised past 250', () => {
 test('inlined schema matches sql/nightops.sql', () => {
   const file = fs.readFileSync(path.join(__dirname, '..', 'sql', 'nightops.sql'), 'utf8');
   assert.deepStrictEqual(N.schemaStatements(), N.schemaStatements(file));
-  assert.strictEqual(N.schemaStatements().length, 4);
+  assert.strictEqual(N.schemaStatements().length, 16);
 });
 
 // ---- the harvest -----------------------------------------------------------
@@ -199,6 +208,8 @@ test('cron route refuses calls without the cron secret', async () => {
   assert.strictEqual(handler.config.maxDuration, 300);
 
   process.env.NIGHTOPS_RUN_SECRET = 'runonly';
+  process.env.GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY || 'test-key';
+  process.env.NIGHTOPS_DATABASE_URL = process.env.NIGHTOPS_DATABASE_URL || 'postgres://unused';
   await handler({ headers: {}, query: { secret: 'nope' } }, res);
   assert.strictEqual(res.code, 401);
   await handler({ headers: {}, query: { secret: 'runonly', group: 'bogus' } }, res);
@@ -214,4 +225,40 @@ test('a place only ever written as capped on an earlier night still gets its det
   const s = await N.runNight(deps(g, db), opts());
   assert.strictEqual(s.seen || 0, 0);
   assert.strictEqual(g.calls.details, s.found);
+});
+
+// ---- no-website track ------------------------------------------------------
+
+test('classifies own sites, directory pages and no site', () => {
+  assert.strictEqual(N.classifySite('https://www.sandovaltax.com/'), 'own');
+  assert.strictEqual(N.classifySite('https://m.facebook.com/joes'), 'directory');
+  assert.strictEqual(N.classifySite('https://joes.wixsite.com/home'), 'directory');
+  assert.strictEqual(N.classifySite('https://www.yelp.com/biz/joes'), 'directory');
+  assert.strictEqual(N.classifySite(null), 'none');
+  assert.strictEqual(N.classifySite('not a url'), 'none');
+});
+
+test('build score favours established, well-rated, reachable businesses', () => {
+  assert.strictEqual(N.buildScore({ rating: 4.8, reviews: 300, phone: 'x' }), 130);
+  assert.strictEqual(N.buildScore({ rating: 4.1, reviews: 40, phone: null }), 30);
+  assert.strictEqual(N.buildScore({}), 0);
+  assert.ok(N.buildScore({ rating: 4.6, reviews: 120, phone: 'x' }) >
+            N.buildScore({ rating: 3.9, reviews: 8, phone: 'x' }));
+});
+
+test('harvest tags each new lead with a track and scores the build leads', async () => {
+  const g = fakeGoogle({ perPage: 10 });
+  const db = fakeDb();
+  const s = await N.runNight(deps(g, db), opts());
+  const fresh = db.rows.filter((r) => r.status === 'new');
+  assert.ok(fresh.length > 0);
+  for (const r of fresh) {
+    const n = idNum(r.place_id);
+    const want = n % 3 === 0 ? 'none' : n % 5 === 0 ? 'directory' : 'own';
+    assert.strictEqual(r.site_kind, want, r.place_id);
+    assert.strictEqual(r.track, want === 'own' ? 'audit' : 'build');
+    if (r.track === 'build') assert.strictEqual(typeof r.build_score, 'number');
+    else assert.strictEqual(r.build_score, null);
+  }
+  assert.strictEqual(s.tracks.audit + s.tracks.build, fresh.length);
 });

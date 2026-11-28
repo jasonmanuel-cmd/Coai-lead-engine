@@ -15,24 +15,13 @@
 //      NIGHTOPS_MAX_DETAILS (optional; can only lower the 250 ceiling),
 //      NIGHTOPS_RUN_SECRET (optional; opens this route only, for manual runs).
 
-const { isCronAuthorized, safeEqual } = require('../lib/cron-auth');
 const N = require('../lib/nightops');
 
 const MAX_DURATION_S = 300;
 const TIME_BUDGET_MS = 240 * 1000; // stop paying for details with a minute to spare
 
-// A narrow secret for manual runs of THIS route only, so a person (or a tool
-// that can't read CRON_SECRET) can trigger a run without the shared cron key.
-function isRunAuthorized(req) {
-  const secret = process.env.NIGHTOPS_RUN_SECRET;
-  if (!secret) return false;
-  const header = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
-  const q = (req.query && req.query.secret) || '';
-  return Boolean((header && safeEqual(header, secret)) || (q && safeEqual(q, secret)));
-}
-
 module.exports = async function handler(req, res) {
-  if (!isCronAuthorized(req) && !isRunAuthorized(req)) {
+  if (!N.isNightopsAuthorized(req)) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
