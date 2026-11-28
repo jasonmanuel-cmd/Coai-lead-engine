@@ -6,7 +6,8 @@
   "type": "commonjs",
   "scripts": {
     "start": "vercel dev",
-    "deploy": "vercel deploy --prod"
+    "deploy": "vercel deploy --prod",
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
