@@ -84,3 +84,22 @@ git add -A && git commit -m "your message" && git push   # auto-deploys to coaih
 - `/tos` — Terms of Service
 - `/privacy` — Privacy Policy
 (Both linked from the signup modal — required by Stripe onboarding.)
+
+## 🌙 Night Ops nightly harvest (`/api/cron-nightops`)
+
+Vercel Cron calls it at **08:30 UTC** (12:30 AM PST / 1:30 AM PDT), ahead of the
+Night Ops routine at 1:43 AM Pacific. It pulls one rotation group of Bakersfield
+businesses from Google Maps and writes them to the **Night Ops database**
+(Neon project `coai-nightops`, table `nightly_leads`, run log `nightops_runs`).
+The routine reads the rows with SQL over its Neon connector, so no API key ever
+goes into the routine's prompt. Schema: `sql/nightops.sql`.
+
+- Rotation by date: trades → beauty → pro → food (2026-11-28 = food). Override a
+  manual run with `?group=`.
+- Cost: ≤ 18 Nearby Search pages + 1 geocode per night, and at most **250**
+  Place Details calls (`NIGHTOPS_MAX_DETAILS` can only lower it). Places pulled on
+  an earlier night are written as `seen` with no Details call; past the cap they
+  are written as `capped`.
+- Env (Production): `CRON_SECRET`, `GOOGLE_PLACES_API_KEY`, `NIGHTOPS_DATABASE_URL`.
+- Manual run: `curl -H "Authorization: Bearer $CRON_SECRET" https://coaihq.online/api/cron-nightops`
+- Tests: `npm test` (no network, no database).

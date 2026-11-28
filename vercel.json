@@ -1,5 +1,8 @@
 {
   "version": 2,
+  "crons": [
+    { "path": "/api/cron-nightops", "schedule": "30 8 * * *" }
+  ],
   "builds": [
     { "src": "api/search.js",   "use": "@vercel/node" },
     { "src": "api/scrape.js",  "use": "@vercel/node" },
@@ -16,6 +19,7 @@
     { "src": "api/cron-audit.js", "use": "@vercel/node" },
     { "src": "api/cron-qualify.js", "use": "@vercel/node" },
     { "src": "api/cron-outreach.js", "use": "@vercel/node" },
+    { "src": "api/cron-nightops.js", "use": "@vercel/node", "config": { "maxDuration": 300 } },
     { "src": "tos.html", "use": "@vercel/static" },
     { "src": "privacy.html", "use": "@vercel/static" },
     { "src": "index.html",      "use": "@vercel/static" },
@@ -42,6 +46,7 @@
     { "src": "/api/cron-audit", "dest": "/api/cron-audit.js" },
     { "src": "/api/cron-qualify", "dest": "/api/cron-qualify.js" },
     { "src": "/api/cron-outreach", "dest": "/api/cron-outreach.js" },
+    { "src": "/api/cron-nightops", "dest": "/api/cron-nightops.js" },
     { "src": "/tos", "dest": "/tos.html" },
     { "src": "/privacy", "dest": "/privacy.html" },
     { "src": "/robots.txt", "dest": "/robots.txt" },
