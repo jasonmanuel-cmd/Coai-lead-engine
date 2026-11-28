@@ -89,8 +89,10 @@ CREATE TABLE IF NOT EXISTS outreach_touches (
 CREATE INDEX IF NOT EXISTS idx_outreach_touches_status ON outreach_touches (status);
 CREATE INDEX IF NOT EXISTS idx_outreach_touches_email ON outreach_touches (lower(email));
 
--- Email leads whose latest sent touch is due a follow-up: touch 2 three days
--- after touch 1, touch 3 four days after touch 2 (day 7), then never again.
+-- Email leads whose latest sent touch is due a follow-up: touch 2 on the third
+-- day after touch 1, touch 3 on the fourth day after touch 2 (day 7), then
+-- never again. Counted in Pacific calendar days, so the 12:40 AM job drafts on
+-- the right day instead of waiting for the exact hour the last email went out.
 -- A reply, bounce or opt-out on any touch stops the lead; an opt-out stops
 -- that email address everywhere.
 CREATE OR REPLACE VIEW followups_due AS
@@ -103,13 +105,17 @@ WITH last_sent AS (
 SELECT l.lead_key, l.place_id, l.business_name, l.email,
        l.touch_no + 1 AS next_touch, l.sent_at AS last_sent_at,
        l.subject AS last_subject, l.fact, l.offer,
-       l.sent_at + CASE WHEN l.touch_no = 1 THEN interval '3 days' ELSE interval '4 days' END AS due_at
+       (((l.sent_at AT TIME ZONE 'America/Los_Angeles')::date
+         + CASE WHEN l.touch_no = 1 THEN 3 ELSE 4 END)::timestamp
+         AT TIME ZONE 'America/Los_Angeles') AS due_at
   FROM last_sent l
  WHERE l.touch_no < 3
    AND l.channel = 'email'
    AND l.email IS NOT NULL
    AND l.sent_at IS NOT NULL
-   AND l.sent_at + CASE WHEN l.touch_no = 1 THEN interval '3 days' ELSE interval '4 days' END <= now()
+   AND (l.sent_at AT TIME ZONE 'America/Los_Angeles')::date
+         + CASE WHEN l.touch_no = 1 THEN 3 ELSE 4 END
+       <= (now() AT TIME ZONE 'America/Los_Angeles')::date
    AND NOT EXISTS (SELECT 1 FROM outreach_touches t
                     WHERE t.lead_key = l.lead_key AND t.touch_no > l.touch_no)
    AND NOT EXISTS (SELECT 1 FROM outreach_touches t
