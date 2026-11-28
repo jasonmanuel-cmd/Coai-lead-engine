@@ -1,6 +1,6 @@
 // api/cron-nightops.js — nightly lead harvest for Night Ops.
 //
-// Vercel Cron calls this at 08:30 UTC (12:30 AM PST / 1:30 AM PDT), ahead of the
+// Vercel Cron calls this at 08:15 UTC (12:15 AM PST / 1:15 AM PDT), ahead of the
 // Night Ops routine at 1:43 AM Pacific. It pulls tonight's rotation group from
 // Google Maps and writes it to the Night Ops database, where the routine reads
 // it over its database connector. No key ever goes in the routine's prompt.
