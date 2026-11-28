@@ -43,7 +43,7 @@ function fakeGoogle({ perPage = 20, pages = 3, geocodeStatus = 'OK' } = {}) {
   return { fetchJson, calls };
 }
 
-function fakeDb({ prior = [], tonight = [] } = {}) {
+function fakeDb({ prior = [], tonight = [], onlyCapped = [] } = {}) {
   const rows = [];
   const runs = [];
   async function query(text, params = []) {
@@ -53,8 +53,9 @@ function fakeDb({ prior = [], tonight = [] } = {}) {
     if (/bool_or/.test(text)) {
       const ids = new Set(params[0]);
       return { rows: [
-        ...prior.filter((id) => ids.has(id)).map((place_id) => ({ place_id, tonight: false })),
-        ...tonight.filter((id) => ids.has(id)).map((place_id) => ({ place_id, tonight: true })),
+        ...prior.filter((id) => ids.has(id)).map((place_id) => ({ place_id, tonight: false, fetched_before: true })),
+        ...tonight.filter((id) => ids.has(id)).map((place_id) => ({ place_id, tonight: true, fetched_before: false })),
+        ...onlyCapped.filter((id) => ids.has(id)).map((place_id) => ({ place_id, tonight: false, fetched_before: false })),
       ] };
     }
     if (/INSERT INTO nightly_leads/.test(text)) {
@@ -196,4 +197,21 @@ test('cron route refuses calls without the cron secret', async () => {
   await handler({ headers: { authorization: 'Bearer ' }, query: {} }, res);
   assert.strictEqual(res.code, 401, 'unset secret fails closed');
   assert.strictEqual(handler.config.maxDuration, 300);
+
+  process.env.NIGHTOPS_RUN_SECRET = 'runonly';
+  await handler({ headers: {}, query: { secret: 'nope' } }, res);
+  assert.strictEqual(res.code, 401);
+  await handler({ headers: {}, query: { secret: 'runonly', group: 'bogus' } }, res);
+  assert.strictEqual(res.code, 400, 'run secret gets past auth; bad group rejected');
+  await handler({ headers: {}, query: { secret: 'runonly', max: '-1' } }, res);
+  assert.strictEqual(res.code, 400, 'bad max rejected');
+  delete process.env.NIGHTOPS_RUN_SECRET;
+});
+
+test('a place only ever written as capped on an earlier night still gets its details', async () => {
+  const g = fakeGoogle({ perPage: 10 });
+  const db = fakeDb({ onlyCapped: ['restaurant-0-5'] });
+  const s = await N.runNight(deps(g, db), opts());
+  assert.strictEqual(s.seen || 0, 0);
+  assert.strictEqual(g.calls.details, s.found);
 });
